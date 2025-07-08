@@ -1,0 +1,68 @@
+🤖 Multi-CNC Coordination Strategy – cncpick2
+
+This document outlines the strategy for supporting multiple coordinated CNC picker arms running in parallel on the same conveyor.
+
+⸻
+
+🎯 Purpose
+	•	Scale system throughput with up to 4 CNC arms
+	•	Assign pick targets efficiently without conflict
+	•	Preserve modular agent logic while coordinating globally
+
+⸻
+
+📐 Architecture Overview
+
+Component	Role
+scoring_agent	Assigns objects to specific CNC units
+motion_agent_N	One per CNC arm (e.g., motion_agent_2)
+trigger_agent_N	One per CNC pickup camera zone
+vision_agent	Sees all objects, labels lane and size
+
+
+⸻
+
+🧠 Coordination Logic
+	1.	Vision detects object and sends info to scoring_agent
+	2.	Scoring ranks all known CNC units:
+	•	Lane proximity
+	•	Time since last pickup
+	•	Queue length / availability
+	3.	Selected CNC ID is included in object_assigned event
+
+{
+  "event": "object_assigned",
+  "assigned_to": "motion_agent_2",
+  "object_id": "abc123",
+  "lane": 3
+}
+
+	4.	Only assigned motion_agent will act
+	5.	trigger_agent_X watches its zone and notifies its CNC agent when match arrives
+
+⸻
+
+🔁 Load Balancing Strategy
+	•	First-fit + round-robin hybrid
+	•	Idle CNC gets highest priority
+	•	Agents keep local assignment buffers of 1–2 items max
+
+⸻
+
+📦 Message Routing
+	•	All agents subscribe to shared PUB/SUB channel
+	•	Messages are filtered by assigned_to field
+	•	ZMQ filtering keeps overhead low
+
+⸻
+
+🧪 Test Modes
+	•	Simulate 2–4 parallel CNC units
+	•	Visual overlay shows pickups by agent
+	•	metrics_agent splits KPIs by motion agent name
+
+⸻
+
+📌 Summary
+
+This strategy enables fully decentralized coordination between multiple CNC arms, with lightweight arbitration via the scoring agent and clearly isolated agent roles. It scales easily and supports future performance optimization.

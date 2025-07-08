@@ -1,0 +1,74 @@
+👁️ Vision Depth & Lane Mapping Strategy – cncpick2
+
+This document outlines how the vision system processes RGB + depth data to assign objects to lanes and determine accurate Z pickup height.
+
+⸻
+
+🧠 Purpose
+	•	Detect green objects in live/simulated frames
+	•	Extract object centroid, area, and depth
+	•	Classify lane by image-space X mapping
+
+⸻
+
+🧮 Input
+	•	RGB frame from camera (sim or real)
+	•	Depth map aligned to RGB (from OAK-D or simulator)
+
+⸻
+
+🧾 Detection Output Fields
+
+{
+  "event": "object_detected",
+  "agent": "vision_agent",
+  "object_id": "abc123",
+  "lane": 2,
+  "type": "green",
+  "area": 1450,
+  "depth_mm": 78.5,
+  "height_mm": 35.0,
+  "bbox": [x, y, w, h],
+  "timestamp": 1234567890.0
+}
+
+
+⸻
+
+🗺️ Lane Mapping
+	•	Performed using a lane_mapper JSON config:
+
+{
+  "lanes": {
+    "0": {"x_min": 0, "x_max": 160},
+    "1": {"x_min": 160, "x_max": 320},
+    "2": {"x_min": 320, "x_max": 480},
+    "3": {"x_min": 480, "x_max": 640}
+  }
+}
+
+	•	Mapped by centroid X coordinate in pixel space
+
+⸻
+
+📏 Depth & Height
+	•	Depth = raw distance from camera
+	•	Height = object top surface above belt
+	•	Formula:
+
+height_mm = belt_z_reference - object_depth_z
+
+	•	belt_z_reference defined per camera setup
+
+⸻
+
+🧪 Simulation
+	•	Simulated frames provide depth per object
+	•	Same pipeline processes both real and sim
+	•	Ensures parity across test and hardware deployment
+
+⸻
+
+📌 Summary
+
+The vision system is responsible for translating raw camera data into actionable metadata for scoring and motion agents. Lane assignment and object height are critical for accurate pickup.

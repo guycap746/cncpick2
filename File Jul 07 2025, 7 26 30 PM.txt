@@ -1,0 +1,65 @@
+🛰️ Post-Pick Monitoring Agent Design – cncpick2
+
+This document defines the role, logic, and data usage of the post_pick_monitor_agent, which validates object pickup accuracy and missed target detection.
+
+⸻
+
+🎯 Purpose
+	•	Observe conveyor after pickup zone
+	•	Confirm whether target objects were successfully removed
+	•	Flag objects that should have been picked but were not
+	•	Track unassigned good objects to inform system improvements
+
+⸻
+
+🎥 Inputs
+	•	Camera feed from post-pickup area
+	•	YOLO detection model output (same or alternative model)
+	•	Object history from scoring_agent and vision_agent
+
+⸻
+
+🧪 Behavior
+	1.	Listens for:
+	•	object_assigned
+	•	object_picked
+	•	object_dropped
+	•	object_detected (initial + post-pick)
+	2.	Tracks expected object positions after pickup zone
+	3.	Compares post-pick detections against original classifications
+	4.	Emits object_missed or false_positive_picked when discrepancies arise
+
+⸻
+
+🔄 Event Output
+
+{
+  "event": "object_missed",
+  "agent": "post_pick_monitor_agent",
+  "object_id": "obj_0043",
+  "reason": "target_detected downstream",
+  "lane": 2,
+  "timestamp": 1234567890.0
+}
+
+{
+  "event": "unassigned_good_object",
+  "object_type": "green",
+  "area": 1550,
+  "lane": 1,
+  "timestamp": 1234567890.0
+}
+
+
+⸻
+
+📌 Notes
+	•	Can use a separate YOLO model or custom heuristics
+	•	Does not intervene, only observes
+	•	Complements learning_feedback_agent for data-driven refinement
+
+⸻
+
+🧠 Summary
+
+This passive but critical agent provides downstream accountability by detecting failures in vision, scoring, or mechanical motion. It strengthens system reliability, learning loops, and auditability.

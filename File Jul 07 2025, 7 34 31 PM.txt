@@ -1,0 +1,103 @@
+🧠 Sanity Test Plan – cncpick2
+
+The sanity test validates that the core logic and agent communication of the cncpick2 system function correctly in simulation. It is designed to detect wiring bugs, misassignments, or missing events before scaling to complex scenarios.
+
+⸻
+
+🎯 Purpose
+	•	Confirm all agent roles are correctly implemented
+	•	Ensure proper event sequencing: spawn → detect → assign → pick → drop
+	•	Validate message delivery across ZeroMQ
+	•	Detect logic gaps or placeholder bypasses early
+
+⸻
+
+🔧 Test Configuration
+
+Scenario file: /tests/scenarios/sanity_test.json
+
+Structure:
+
+[
+  {"object_id": "uuid1", "lane": 0, "delay_ms": 500},
+  {"object_id": "uuid2", "lane": 1, "delay_ms": 500},
+  {"object_id": "uuid3", "lane": 2, "delay_ms": 500},
+  {"object_id": "uuid4", "lane": 3, "delay_ms": 500}
+]
+
+	•	One object per lane
+	•	Fixed delay to simulate spaced conveyor input
+	•	Pickups are simple (non-overlapping)
+
+⸻
+
+🧪 Required Agents
+	•	simulator_agent
+	•	vision_agent
+	•	scoring_agent
+	•	motion_agent_0 → motion_agent_3
+	•	trigger_agent_0 → trigger_agent_3
+	•	grbl_driver_agent (simulated)
+	•	data_logging_agent
+
+⸻
+
+✅ Assertions (via assert_helpers.py)
+
+Phase	Hook Function	Checks
+Spawn	hook_after_spawn	Origin agent is simulator_agent
+Detection	hook_after_detection	Includes height_mm, correct lane, from vision_agent
+Assignment	hook_after_assignment	Comes from scoring_agent, includes assigned_to
+Pickup	hook_after_pickup	Comes from motion_agent_X, includes object_id
+Drop	hook_after_drop	From motion_agent_X, includes drop_location
+
+All must pass per object.
+
+⸻
+
+📝 Output Summary
+
+After test execution, the runner produces:
+	•	Full message log: /tests/logs/sanity_test_full.jsonl
+	•	Summary count: /tests/logs/results_summary.json
+
+Example:
+
+{
+  "object_spawned": 4,
+  "object_detected": 4,
+  "object_assigned": 4,
+  "object_picked": 4,
+  "object_dropped": 4
+}
+
+
+⸻
+
+🚨 Failure Examples
+
+Failure Type	Symptom	Cause
+Missing assignment	No object_assigned event	Scoring logic bug
+Pickup mismatch	Wrong agent ID in object_picked	Improper assignment tracking
+Extra/missing logs	Summary count mismatch	ZMQ loss or logic error
+No height	height_mm missing in detection	Depth handling bug
+
+
+⸻
+
+🔁 Repetition Strategy
+	•	Sanity test is run after each core logic edit
+	•	All future tests derive from this flow
+	•	Variants will test pickup failures, clutter, occlusion, etc.
+
+⸻
+
+🧩 Next Steps
+	•	Expand to multi-object/lane collisions
+	•	Add noise to detection results
+	•	Test failure injection and recovery
+	•	Include real camera frame input passthrough
+
+⸻
+
+This sanity test ensures system wiring is sound, enabling reliable development of complex agent logic and real-world integration.

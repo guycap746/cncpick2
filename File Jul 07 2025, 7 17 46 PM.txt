@@ -1,0 +1,63 @@
+🧠 cncpick2 – Modular Pick-and-Place System with Simulation & AI Agents
+
+cncpick2 is a modular, agent-driven CNC pick-and-place pipeline with live simulation, vision inference, scoring, and motion execution—supporting real-time GRBL CNC hardware or simulated conveyor-based object flows.
+
+⸻
+
+🚀 Key Features
+	•	⚙️ Agent-based architecture using ZeroMQ
+	•	📦 Simulated conveyor system with object spawner
+	•	🧠 YOLO-based vision detection and depth capture
+	•	🪄 Object scoring and assignment to CNC arms
+	•	🦾 CNC motion control via G-code (GRBL or mock)
+	•	🧪 Sanity tests, playback tools, and calibration visualizers
+	•	📊 Web-based dashboard and remote monitoring
+
+⸻
+
+🧱 Project Structure
+
+Folder	Description
+agents/	All functional agents (vision, scoring, etc)
+simulator/	Object flow and lane logic simulation
+tests/	Test harness and event assertions
+calibration/	CNC ↔ camera transform data and helpers
+config/	Lane maps, CNC settings, simulation profiles
+docs/	System design plans and onboarding guides
+
+
+⸻
+
+✅ Getting Started
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python bootstrap.py --profile sim
+
+Open the visual dashboard:
+
+http://localhost:8501
+
+Run a sanity test:
+
+python test_runner.py --profile sanity
+
+
+⸻
+
+📌 Highlights
+	•	Full multi-agent simulator OR real CNC integration
+	•	Swappable lane/detection logic and test fixtures
+	•	Built-in calibration, test replay, and failure analysis
+
+For deeper system design, see docs/ or run:
+
+make docs-index
+
+
+⸻
+
+📬 Contact
+
+Built with AI-assisted development workflows and open tooling. Contributions and hardware support welcome.

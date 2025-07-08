@@ -1,0 +1,61 @@
+🧩 Assertion Helpers – cncpick2
+
+This document explains the role of assert_helpers.py, which contains reusable logic to validate that each step of the cncpick2 system behaves correctly during testing.
+
+⸻
+
+🎯 Purpose
+	•	Provide reusable assertions for system sanity
+	•	Ensure each agent is correctly performing its designated tasks
+	•	Power the test_runner.py validation flow
+
+⸻
+
+✅ Hook Summary
+
+Each hook inspects logs and throws an AssertionError if validation fails:
+
+hook_after_spawn(logs)
+	•	Verifies object_spawned event exists
+	•	Ensures originating agent is simulator_agent
+
+hook_after_detection(logs)
+	•	Confirms object was detected by vision_agent
+	•	Checks for height_mm presence in metadata
+
+hook_after_assignment(logs)
+	•	Ensures scoring_agent assigned the object
+	•	Confirms assigned_to field exists
+
+hook_after_pickup(logs)
+	•	Validates motion_agent picked an object
+	•	Checks that object_id is logged
+
+hook_after_drop(logs)
+	•	Confirms object drop completed by motion_agent
+	•	Verifies drop_location is included
+
+⸻
+
+📊 Summary Stats
+
+The helper also includes a function:
+
+generate_results_summary(logs, path="tests/logs/results_summary.json")
+
+	•	Tallies event types
+	•	Writes a JSON summary to disk
+
+⸻
+
+🧪 Integration
+
+Used by:
+	•	test_runner.py
+	•	Sanity tests and regression checkers
+
+⸻
+
+📌 Summary
+
+These assertion helpers ensure every stage of the object lifecycle is properly executed by the correct agent and annotated with required metadata. They are a key part of test reliability.

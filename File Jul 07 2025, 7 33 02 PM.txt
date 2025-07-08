@@ -1,0 +1,112 @@
+🧮 Agent Profile: scoring_agent – cncpick2
+
+This document defines the behavior, inputs, and output logic of the scoring_agent, which ranks objects and assigns them to motion agents.
+
+⸻
+
+🧠 Agent Overview
+	•	Maintains a queue of detected, unassigned objects
+	•	Scores objects based on area, confidence, and position
+	•	Assigns best objects to available motion agents
+	•	Notified when motion agent becomes ready
+
+⸻
+
+📂 Responsibilities
+	1.	Subscribe to object_detected from vision_agent
+	2.	Track object status and metadata
+	3.	Subscribe to motion_agent_ready from each motion agent
+	4.	Assign objects to idle motion agents
+	5.	Publish object_assigned events
+
+⸻
+
+📥 Subscribed Events
+
+object_detected
+
+From: vision_agent
+	•	Adds object to internal queue
+	•	Marks as unassigned
+
+motion_agent_ready
+
+From: any motion_agent
+	•	Triggers assignment logic
+
+⸻
+
+📤 Published Events
+
+object_assigned
+
+{
+  "event": "object_assigned",
+  "agent": "scoring_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "assigned_to": "motion_agent_2"
+  }
+}
+
+
+⸻
+
+⚖️ Scoring Logic
+
+Criteria
+	•	Larger area is better (proxy for easier pickup)
+	•	Higher confidence (if available)
+	•	Less crowded (future enhancement)
+
+Output
+	•	Chooses best-fit unassigned object for requesting lane
+	•	Avoids assigning multiple agents to same object
+
+⸻
+
+🔁 Internal Object State
+
+Each object in the scoring pool stores:
+
+{
+  "object_id": "uuid",
+  "lane": 2,
+  "area_px": 3033,
+  "height_mm": 29.8,
+  "assigned": false
+}
+
+
+⸻
+
+🔁 Lifecycle
+	1.	Object detected → stored
+	2.	Motion agent ready → finds match
+	3.	Publishes assignment → updates internal status
+	4.	Motion agent completes → resets ready state
+
+⸻
+
+🔧 Configuration Options
+
+scoring_agent:
+  scoring_method: "area"
+  max_objects: 50
+  assignment_strategy: "per_lane"
+
+
+⸻
+
+🧪 Sanity Test Expectations
+	•	Each detected object must be assigned once
+	•	No double-assignments
+	•	Assignment must occur after motion agent ready
+
+⸻
+
+📌 Summary
+	•	Coordinates flow between vision detection and physical motion
+	•	Ensures agents only act on valid, pickable objects
+	•	Centralizes decision logic for deterministic and testable behavior

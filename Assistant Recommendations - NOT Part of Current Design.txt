@@ -1,0 +1,145 @@
+# Assistant Recommendations - NOT Part of Current Design
+
+**⚠️ IMPORTANT: These are suggestions from the AI assistant and are NOT part of the current cncpick2 design documentation. They should be considered separately for future enhancements.**
+
+## Critical Design Issues Found
+
+### 1. Object ID Tracking in Production
+
+**Issue**: No simulator in real deployment to generate IDs
+**Resolution Adopted**: Vision agent generates IDs in production during YOLO classification
+
+### 2. Timeout Mechanisms
+
+**Recommendation**: Add basic timeouts to each agent for MVP:
+
+- Motion waiting for trigger: 5 seconds
+- Trigger watching for object: 10 seconds
+- Assignment to completion: 30 seconds
+- On timeout: publish event, return to ready state
+
+### 3. Belt Speed Synchronization
+
+**Resolution Adopted**: Vision agent estimates speed in production by tracking objects
+
+### 4. Message Routing Optimization
+
+**Recommendation**: Use ZeroMQ topic filtering:
+
+```python
+# Motion agent subscribes to its specific topic
+sub_socket.subscribe(f"motion_agent_0:".encode())
+
+# Scoring agent publishes with topic prefix
+pub_socket.send_string(f"motion_agent_0: {json.dumps(message)}")
+```
+
+### 5. State Tracking Service
+
+**Recommendation**: Add object state tracking:
+
+- Detected → Assigned → Picking → Picked → Dropped
+- Shared state accessible by all agents
+- Prevents double-assignment
+
+## Immediate Recommendations (Pre-Implementation)
+
+### 1. Resolve Documentation Inconsistencies
+
+**Priority: Critical**
+
+- Multiple inconsistencies found across 72 documents
+- Should be resolved before implementation begins
+- See “Design Documentation Inconsistencies Found” artifact for full list
+
+### 2. Create Canonical References
+
+- Single source of truth for message formats
+- Definitive port assignments
+- Clear agent naming conventions
+- Standardized configuration structure
+
+### 3. Timestamp Standardization
+
+**Recommendation**: Use epoch timestamps with millisecond precision
+
+- Format: `1234567890.123` (float)
+- Benefits: Performance, precision, compact, sortable
+- Human-readable versions can be added by logging agent only
+
+### 4. Object Classification Field
+
+**Recommendation**: Use `class` field name
+
+- Aligns with computer vision terminology (YOLO)
+- Use simple values like “green” unless subcategories needed
+- More appropriate than generic “type”
+
+## Communication Enhancements
+
+### 1. Time Synchronization
+
+- NTP-based time sync across agents
+- Useful for distributed deployments
+
+### 2. Reliability Patterns
+
+- Circuit breaker pattern for failure isolation
+- Message deduplication
+- Guaranteed delivery with retries
+- Connection recovery mechanisms
+
+### 3. Performance Optimizations
+
+- Message batching for high throughput
+- Compression for large payloads
+- Zero-copy messaging for image data
+- Connection pooling
+
+### 4. Security Additions
+
+- Message authentication (HMAC)
+- Payload encryption for sensitive data
+- Access control lists
+
+### 5. Testing Infrastructure
+
+- Message replay systems
+- Chaos injection for resilience testing
+- Network failure simulation
+
+### 6. Monitoring Extensions
+
+- Message tracing with hop tracking
+- Communication health metrics
+- Latency profiling
+
+### 7. Advanced Patterns
+
+- Distributed state consistency
+- Dynamic agent discovery
+- Event sourcing for state recovery
+
+## Implementation Enhancements
+
+### 1. Error Handling
+
+- Timeout configurations on all sockets
+- Graceful degradation strategies
+- Automatic reconnection logic
+
+### 2. Production Hardening
+
+- High water mark tuning
+- Buffer size optimization
+- Thread pool configuration
+
+### 3. Deployment Patterns
+
+- Multi-site network topology
+- Load balancer integration
+- Container orchestration support
+
+-----
+
+**Note**: These recommendations should only be considered after the core system is working according to the original design. They represent potential future enhancements based on common production needs, but may not be necessary for the specific use case.

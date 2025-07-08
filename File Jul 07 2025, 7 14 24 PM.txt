@@ -1,0 +1,64 @@
+🧪 Test Runner – cncpick2
+
+This document outlines the structure and purpose of test_runner.py, which automates test execution and validation for the cncpick2 system.
+
+⸻
+
+🎯 Purpose
+	•	Orchestrate end-to-end test runs
+	•	Load simulation and config environments
+	•	Call assertion hooks to validate logic steps
+	•	Track failures and summary stats
+
+⸻
+
+🚀 Execution Flow
+	1.	Starts a scenario or controlled sim profile
+	2.	Monitors data_logging_agent output
+	3.	Loads structured log stream
+	4.	Invokes assertion helpers:
+
+from assert_helpers import hook_after_spawn, hook_after_detection, ...
+
+
+	5.	Validates event sequencing and agent roles
+	6.	Writes pass/fail results to console + file
+
+⸻
+
+🧩 Hook Coverage
+
+Each test sequence maps to known checkpoints:
+	•	Object spawn
+	•	Vision detection
+	•	Assignment logic
+	•	Trigger approval
+	•	Motion pickup
+	•	Drop confirmation
+
+⸻
+
+🧰 Outputs
+	•	Console summary (✔ / ✖ per hook)
+	•	results_summary.json
+	•	Optional annotated debug log
+
+⸻
+
+🔧 Example Usage
+
+python test_runner.py --profile test_sanity
+
+
+⸻
+
+🧪 Future Features
+	•	Batch test runner
+	•	Scenario replay validation
+	•	Visual diff tools for regression
+
+⸻
+
+📌 Summary
+
+The test runner is central to validating correct agent interactions and ensuring that all logical events are properly emitted and processed in order.

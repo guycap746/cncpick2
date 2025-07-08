@@ -1,0 +1,138 @@
+🤖 Agent Profile: motion_agent – cncpick2
+
+This document defines the role, behavior, and interface of a motion_agent responsible for controlling one CNC picker arm.
+
+⸻
+
+🧠 Agent Overview
+	•	One motion_agent per CNC picker
+	•	Moves arm to pickup lane, performs pickup, executes drop
+	•	Interfaces with: scoring_agent, trigger_agent, grbl_driver_agent
+
+Example Name:
+
+motion_agent_0  (for Lane 0)
+
+
+⸻
+
+🗂️ Responsibilities
+	1.	Receive assigned object from scoring_agent
+	2.	Move to target lane pickup position (pre-grasp)
+	3.	Request monitoring from trigger_agent
+	4.	Await signal that object is under pickup zone
+	5.	Execute G-code macro for pickup
+	6.	Drop object in bin
+	7.	Return to ready position
+	8.	Notify scoring_agent of readiness
+
+⸻
+
+📬 Subscribed Events
+
+object_assigned
+
+From: scoring_agent
+
+{
+  "event": "object_assigned",
+  "payload": {
+    "object_id": "uuid",
+    "assigned_to": "motion_agent_0"
+  }
+}
+
+
+⸻
+
+📤 Published Events
+
+object_picked
+
+{
+  "event": "object_picked",
+  "payload": {
+    "object_id": "uuid"
+  }
+}
+
+object_dropped
+
+{
+  "event": "object_dropped",
+  "payload": {
+    "object_id": "uuid",
+    "drop_location": "bin_0"
+  }
+}
+
+motion_agent_ready
+
+{
+  "event": "motion_agent_ready",
+  "payload": {
+    "status": "idle"
+  }
+}
+
+
+⸻
+
+🤝 Command Flow
+
+Step 1: Assignment Received
+	•	Stores target object_id, lane, height
+	•	Plans motion to pickup pre-position
+
+Step 2: Trigger Request
+	•	Informs trigger_agent_X to begin monitoring lane for object arrival
+	•	Waits for object_ready_for_pickup
+
+Step 3: Pickup Execution
+	•	Sends G-code sequence to grbl_driver_agent, e.g.:
+
+{
+  "type": "gcode_execute",
+  "payload": {
+    "commands": [
+      "G1 X{lane_X} Y{lane_Y} Z{safe_Z}",
+      "G1 Z{object_height - pickup_offset}",
+      "M8",  // Vacuum ON
+      "G1 Z{safe_Z}",
+      "G1 X{bin_X} Y{bin_Y}",
+      "M9"   // Vacuum OFF
+    ]
+  }
+}
+
+Step 4: Drop + Reset
+	•	Reports drop event
+	•	Returns to central ready position
+	•	Sends motion_agent_ready
+
+⸻
+
+⚠️ Special Notes
+	•	Must buffer commands if assigned during motion
+	•	May need to wait for GRBL ok ack before continuing
+	•	Configurable safety zones (Z limits, max feedrates)
+	•	Should retry failed Z-lower if sensor feedback added (future)
+
+⸻
+
+🔧 Configuration Fields (example)
+
+motion_agent_0:
+  lane: 0
+  bin_coords: [350, 100]
+  grbl_id: "grbl_driver_agent"
+  pickup_offset: 3.0
+
+
+⸻
+
+📌 Summary
+	•	Drives a CNC picker arm through assigned motion tasks
+	•	Receives object assignments, performs synchronized pickup
+	•	Abstracts physical machine through grbl_driver_agent
+	•	Publishes motion lifecycle events to system

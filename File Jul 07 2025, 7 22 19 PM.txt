@@ -1,0 +1,62 @@
+🎯 Automated Calibration Agent – cncpick2
+
+This document outlines the role and functionality of a future calibration_agent that automates spatial alignment between vision system coordinates and CNC motion workspace.
+
+⸻
+
+📌 Purpose
+	•	Generate 3D mapping between camera space and CNC coordinate space
+	•	Simplify field setup and maintenance
+	•	Ensure accurate lane and height conversion
+
+⸻
+
+🧱 Input Requirements
+
+Input Source	Description
+Vision Agent	3D camera coordinates (X_cam, Y_cam, Z_cam)
+Motion Agent	CNC jogged positions (X_cnc, Y_cnc, Z_cnc)
+Lane Mapper Config	Expected lane lines in image space
+
+
+⸻
+
+🔁 Calibration Workflow
+	1.	User jogs CNC to 3–5 known landmarks (e.g., corners of belt)
+	2.	For each, the system captures the CNC coordinates and camera 3D position
+	3.	calibration_agent computes an affine transform matrix (or polynomial fit)
+	4.	Matrix is saved to calibration/calib_matrix.json
+	5.	vision_agent loads matrix and applies transform on all new detections
+
+⸻
+
+🧪 Output Example
+
+{
+  "affine_matrix": [
+    [1.02, 0.01, 0.0, 5.0],
+    [0.0, 0.99, 0.0, -3.0],
+    [0.0, 0.0, 1.0, 0.0]
+  ],
+  "residual_error_mm": 1.2
+}
+
+
+⸻
+
+⚠️ Edge Case Handling
+	•	Missing point pair → ignore
+	•	Outlier detection using RANSAC or least squares
+	•	Min required samples: 3 for affine, 4+ for robust fit
+
+⸻
+
+🧠 Vision Adjustments
+	•	Lane assignment refactored to use CNC-transformed points
+	•	Depth-based Z added to pickup planner
+
+⸻
+
+📌 Summary
+
+The calibration agent enables seamless mapping between camera and CNC domains, providing accuracy and flexibility during setup, and making the system plug-and-play across environments.

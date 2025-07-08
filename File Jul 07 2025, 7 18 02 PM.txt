@@ -1,0 +1,63 @@
+🧪 Simulation Scenario Builder Guide – cncpick2
+
+This document describes how to create and customize test scenarios in the simulator for benchmarking, vision training, and edge case validation.
+
+⸻
+
+🎯 Purpose
+	•	Define structured streams of objects and behaviors
+	•	Stress-test agents under controlled conditions
+	•	Automate training data capture workflows
+
+⸻
+
+🗃️ Scenario File Format
+
+Stored as: simulator/scenarios/*.yaml
+
+Example
+
+scenario_name: four_lane_easy
+description: One object per lane, spaced out
+sequence:
+  - lane: 0
+    type: green
+    delay: 1.0
+  - lane: 1
+    type: blue
+    delay: 1.0
+  - lane: 2
+    type: red
+    delay: 1.0
+  - lane: 3
+    type: yellow
+    delay: 1.5
+repeat: true
+
+
+⸻
+
+🔄 Scenario Loader
+	•	Simulator agent parses scenario YAML at launch
+	•	Loop mode supported for infinite playback
+	•	Time granularity: seconds or frame-based
+
+⸻
+
+⚙️ CLI Control
+
+python simulator/main.py --scenario four_lane_easy
+
+
+⸻
+
+🧰 Utilities
+	•	scenario_validator.py: Check schema and delays
+	•	scenario_randomizer.py: Create shuffled variants
+	•	Optional visualizer: Plot lane vs time graph
+
+⸻
+
+📌 Summary
+
+The Scenario Builder framework provides predictable, replayable input patterns that test the resilience, throughput, and correctness of the cncpick2 system under a wide range of real-world and edge-case conditions.

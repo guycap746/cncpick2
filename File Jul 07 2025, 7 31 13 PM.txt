@@ -1,0 +1,71 @@
+🧠 Future Agent Profile: learning_feedback_agent – cncpick2
+
+This document outlines a future enhancement agent intended to analyze performance trends and guide system improvements.
+
+⸻
+
+🧠 Agent Overview
+	•	Aggregates data from other agents
+	•	Tracks pickup success, false negatives, match confidence
+	•	Feeds back into system for continuous improvement
+	•	Optional in early stages, but powerful for long-term tuning
+
+⸻
+
+📂 Responsibilities
+	1.	Ingest events from vision_agent, motion_agent, post_pick_monitor_agent
+	2.	Track:
+	•	Successful pickups per lane
+	•	Detection-to-pickup accuracy
+	•	Object sizes and success rates
+	3.	Suggest score weight changes or vision model thresholds
+
+⸻
+
+📥 Subscribed Events
+	•	object_detected
+	•	object_picked
+	•	object_missed
+	•	object_never_assigned
+
+⸻
+
+📤 Optional Published Events
+
+scoring_tweak_suggestion
+
+{
+  "event": "scoring_tweak_suggestion",
+  "payload": {
+    "recommendation": "Increase area weight for lane 2"
+  }
+}
+
+detection_model_feedback
+
+{
+  "event": "detection_model_feedback",
+  "payload": {
+    "suggested_retrain": true,
+    "misclass_rate": 0.08
+  }
+}
+
+
+⸻
+
+⚙️ Configuration Fields
+
+learning_feedback_agent:
+  enable_feedback: true
+  metrics_window: 500
+  report_interval: 30
+
+
+⸻
+
+📌 Summary
+	•	Gathers cross-agent performance data
+	•	Can suggest vision or scoring refinements
+	•	Optional, but enables intelligent system evolution
+	•	Ideal for production tuning or ML-integrated variants

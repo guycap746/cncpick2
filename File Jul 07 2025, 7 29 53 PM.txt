@@ -1,0 +1,76 @@
+🛡️ Future Agent Profile: safety_agent – cncpick2
+
+This document outlines a future safety_agent responsible for monitoring system-wide health and enforcing safe operation conditions.
+
+⸻
+
+🧠 Agent Overview
+	•	Monitors for hazardous or out-of-bounds behavior
+	•	Verifies motion plans, object alignment, and vacuum state
+	•	Can halt operations in emergency scenarios
+	•	Optional in simulation; critical for physical deployment
+
+⸻
+
+📂 Responsibilities
+	1.	Subscribe to motion and trigger events
+	2.	Monitor for collision risk, pickup anomalies, or unsafe sequences
+	3.	Issue halt_system commands if safety threshold breached
+	4.	Optionally perform pre-check on G-code sequences
+
+⸻
+
+📥 Subscribed Events
+	•	object_assigned
+	•	object_ready_for_pickup
+	•	object_picked
+	•	object_dropped
+	•	recovery_event
+
+⸻
+
+📤 Published Commands
+
+halt_system
+
+{
+  "event": "halt_system",
+  "payload": {
+    "reason": "Z overtravel risk on lane 3"
+  }
+}
+
+
+⸻
+
+⚠️ Safety Policies
+
+Examples:
+	•	Z-axis must not exceed configured max depth
+	•	CNC arm must be at safe height before lateral move
+	•	Vacuum must be ON during pickup
+	•	Object must not be picked outside assigned lane
+
+⸻
+
+🔧 Configuration Options
+
+safety_agent:
+  enable_safety_checks: true
+  max_z_mm: 45
+  vacuum_required_for_pick: true
+
+
+⸻
+
+🚨 Emergency Behavior
+	•	On halt_system, all motion agents stop G-code streams
+	•	System enters paused state
+	•	Recovery may require operator override or recovery_agent
+
+⸻
+
+📌 Summary
+	•	Provides real-time safety enforcement
+	•	Reacts to unsafe conditions across motion and object flow
+	•	Highly recommended for physical deployment

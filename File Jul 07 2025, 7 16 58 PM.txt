@@ -1,0 +1,73 @@
+🧪 Sanity Test Workflow – cncpick2
+
+This document describes the structured step-by-step process followed during a sanity test of the cncpick2 pick-and-place system.
+
+⸻
+
+🎯 Purpose
+	•	Ensure all agents are initialized correctly
+	•	Validate inter-agent communication
+	•	Detect incorrect agent roles, logic, or misrouting
+	•	Catch early development regressions
+
+⸻
+
+✅ Step-by-Step Logic Flow
+
+1. Spawn Object
+	•	Simulator emits object_spawned event
+	•	Logged and verified by data_logging_agent
+	•	Checked: agent = simulator_agent
+
+2. Detect Object
+	•	vision_agent captures RGB + depth
+	•	Simulates YOLO detection
+	•	Computes:
+	•	Classification (color)
+	•	Lane from pixel coordinates
+	•	Area estimate
+	•	Height from depth map
+	•	Emits object_detected event
+
+3. Score + Assign Object
+	•	scoring_agent receives object metadata
+	•	Assigns to best available CNC
+	•	Emits object_assigned event with assigned_to
+
+4. Move + Wait for Trigger
+	•	motion_agent moves to pickup lane
+	•	Requests pickup approval from trigger_agent
+	•	Waits for matching object to arrive in zone
+
+5. Trigger Confirms Match
+	•	trigger_agent validates object:
+	•	Lane match
+	•	Area within tolerance
+	•	Emits pickup_confirmed event
+
+6. Pickup Executed
+	•	motion_agent runs G-code sequence
+	•	Vacuum activated via G-code
+	•	Object lifted, transported to drop bin
+	•	Emits object_picked event
+
+7. Drop Complete
+	•	Drop bin position reached
+	•	Vacuum disabled via G-code
+	•	object_dropped event emitted
+	•	Arm returns to center
+
+⸻
+
+🔍 Assertions Used
+
+See assert_helpers.py for:
+	•	Role verification
+	•	Event ordering
+	•	Data integrity (height, assigned_to, etc)
+
+⸻
+
+📌 Summary
+
+The sanity test ensures all critical system paths and agent responsibilities are working in harmony. It’s the foundational test for development, CI, and pre-release validation.

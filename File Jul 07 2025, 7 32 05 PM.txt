@@ -1,0 +1,85 @@
+📁 Agent Profile: data_logging_agent – cncpick2
+
+This document describes the logging agent responsible for capturing all inter-agent messages and saving them for audit, debugging, and playback.
+
+⸻
+
+🧠 Agent Overview
+	•	Subscribes to all system events via ZeroMQ SUB
+	•	Writes logs to structured file formats
+	•	Low CPU overhead, always-on
+	•	Optional but strongly recommended in both sim and real deployments
+
+⸻
+
+📂 Responsibilities
+	1.	Listen to all PUB channels from all agents
+	2.	Record each message with timestamp and origin
+	3.	Write logs to:
+	•	JSON Lines (.jsonl) for event replay
+	•	Summary JSONs for stats
+	•	Optional: SQLite/Parquet for analytics
+
+⸻
+
+📥 Subscribed Events
+	•	* (wildcard subscription – receives every published event)
+	•	Does not respond or publish
+
+⸻
+
+📄 Log Output Examples
+
+Full Log – sanity_test_full.jsonl
+
+{
+  "event": "object_assigned",
+  "timestamp": "...",
+  "agent": "scoring_agent",
+  "payload": {"object_id": "uuid1", "assigned_to": "motion_agent_0"}
+}
+
+Summary – results_summary.json
+
+{
+  "object_spawned": 4,
+  "object_detected": 4,
+  "object_assigned": 4,
+  "object_picked": 4,
+  "object_dropped": 4
+}
+
+
+⸻
+
+🧪 Sanity Test Role
+
+Used by test_runner.py and assert_helpers.py to:
+	•	Verify all steps completed
+	•	Count agent actions
+	•	Confirm event ordering
+
+⸻
+
+⚙️ Configuration Fields
+
+data_logging_agent:
+  log_path: "tests/logs/"
+  output_format: ["jsonl", "summary"]
+  verbose: false
+
+
+⸻
+
+💡 Playback Use Cases
+	•	Feed logs back into simulator for replay
+	•	Analyze object flow statistics
+	•	Debug delayed or missing events
+
+⸻
+
+📌 Summary
+	•	Listens to every agent
+	•	Records all communication
+	•	Supports audits, debugging, replay, and test validation
+	•	Core to observability during simulation and real runs

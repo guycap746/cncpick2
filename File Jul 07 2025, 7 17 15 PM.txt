@@ -1,0 +1,54 @@
+✅ Release Checklist – cncpick2
+
+This checklist ensures that each release (sim or hardware) meets reliability, documentation, and usability standards.
+
+⸻
+
+🔁 Version Scope
+	•	All core agents updated and tested
+	•	GRBL interface verified (real or sim)
+	•	Vision system passing sanity test
+	•	Scenario library reviewed and exported
+
+⸻
+
+🧪 Testing
+	•	Full test suite passes locally
+	•	Regression log replay confirms no logic drift
+	•	Stress and chaos tests run (optional tier)
+
+⸻
+
+📂 Documentation
+	•	README is up to date
+	•	Design documents bundled into release
+	•	Changelog/roadmap appended to release page
+	•	Calibration report (optional)
+
+⸻
+
+🔧 Build & Deployment
+	•	Docker image rebuilt if needed
+	•	bootstrap.py profiles validated
+	•	Operator quickstart tested
+	•	Remote monitoring active (if enabled)
+
+⸻
+
+🗃️ Artifacts
+	•	Logs and results summary exported
+	•	Annotated video or overlays (if enabled)
+	•	Scenario export: simulator/scenarios/*.yaml
+
+⸻
+
+☁️ Optional Cloud Release
+	•	Uploaded to S3, GitHub Release, or Drive
+	•	Archive .zip bundle created
+
+⸻
+
+📌 Final Signoff
+	•	Confirm lead developer and QA review
+	•	Tag release: git tag v0.X.X && git push --tags
+	•	Notify collaborators / update roadmap

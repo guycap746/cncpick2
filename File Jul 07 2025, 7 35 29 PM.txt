@@ -1,0 +1,161 @@
+🔄 Detailed Logic Map – cncpick2
+
+This document outlines the complete step-by-step logical flow for a single object lifecycle in the system, covering all agent interactions, responsibilities, and communication patterns.
+
+⸻
+
+🎬 1. Object Enters the System
+
+Agent: simulator_agent
+	•	Spawns a new object in the simulation at a given time, lane, and position.
+	•	Publishes object_spawned event.
+
+{
+  "event": "object_spawned",
+  "object_id": "uuid1234",
+  "lane": 2,
+  "timestamp": "...",
+  "agent": "simulator_agent"
+}
+
+
+⸻
+
+🎯 2. Object Is Detected by Vision
+
+Agent: vision_agent
+	•	Simulates YOLO detection of object (green object detection).
+	•	Calculates object area, lane from pixel coordinates, and Z height from depth map.
+	•	Publishes object_detected event.
+
+{
+  "event": "object_detected",
+  "object_id": "uuid1234",
+  "class": "green_target",
+  "lane": 2,
+  "height_mm": 31.5,
+  "area_px": 3088,
+  "agent": "vision_agent"
+}
+
+
+⸻
+
+📋 3. Object Is Assigned to a CNC Picker
+
+Agent: scoring_agent
+	•	Maintains a queue of detected objects.
+	•	When a motion agent becomes available, assigns an object.
+	•	Publishes object_assigned event.
+
+{
+  "event": "object_assigned",
+  "object_id": "uuid1234",
+  "assigned_to": "motion_agent_1",
+  "agent": "scoring_agent"
+}
+
+
+⸻
+
+📬 4. Motion Agent Moves to Lane & Requests Trigger
+
+Agent: motion_agent_1
+	•	Receives assignment from scoring_agent.
+	•	Moves to correct pickup lane via G-code.
+	•	Submits request to trigger_agent_1 to watch for correct object.
+	•	Enters WAIT state until trigger signal.
+
+⸻
+
+👁️ 5. Object Reaches Pickup Zone
+
+Agent: trigger_agent_1
+	•	Continuously watches RGB stream for matching object (lane + area).
+	•	When object matches, publishes object_ready_for_pickup event.
+
+{
+  "event": "object_ready_for_pickup",
+  "object_id": "uuid1234",
+  "lane": 2,
+  "agent": "trigger_agent_1"
+}
+
+
+⸻
+
+🤖 6. Motion Agent Executes Pickup Routine
+
+Agent: motion_agent_1
+	•	On trigger, sends G-code to grbl_driver_agent:
+	•	Move in sync with conveyor
+	•	Lower Z using provided height
+	•	Turn on vacuum (M8) at correct time
+	•	Lift object and move to drop zone
+	•	Publishes object_picked event
+
+{
+  "event": "object_picked",
+  "object_id": "uuid1234",
+  "agent": "motion_agent_1"
+}
+
+
+⸻
+
+📦 7. Object Is Dropped in Bin
+
+Agent: motion_agent_1
+	•	Moves to virtual drop location
+	•	Turns vacuum off (M9) to release
+	•	Publishes object_dropped event
+	•	Moves to central ready position
+	•	Publishes motion_agent_ready to scoring_agent
+
+{
+  "event": "object_dropped",
+  "object_id": "uuid1234",
+  "drop_location": "bin_1",
+  "agent": "motion_agent_1"
+}
+
+
+⸻
+
+📉 8. Post-Pick Monitoring (Passive)
+
+Agent: post_pick_monitor_agent
+	•	Tracks objects that pass beyond pickup zone
+	•	Publishes object_missed if a previously-assigned object is seen after expected pickup
+	•	Tracks YOLO vs. ground-truth vision discrepancy
+
+⸻
+
+🧾 9. Logging
+
+Agent: data_logging_agent
+	•	SUB socket listens to all agent PUB messages
+	•	Writes structured log entries to disk (JSONL + SQLite)
+	•	Used by:
+	•	test_runner.py
+	•	post_pick_monitor_agent
+	•	Future metrics agent
+
+⸻
+
+🧠 10. Next Cycle Begins
+	•	scoring_agent is notified that motion_agent_1 is available
+	•	Next unassigned object is given for pickup
+	•	New object spawns into the system
+
+⸻
+
+✅ End-to-End Flow Complete
+
+This logic map ensures:
+	•	Each agent performs its intended role
+	•	No shortcut logic is used
+	•	Sim mirrors real-world messaging
+	•	Failures and diagnostics are traceable
+
+We can now derive message schemas and agent-specific docs from this foundation.

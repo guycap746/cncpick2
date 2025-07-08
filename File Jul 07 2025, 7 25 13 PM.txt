@@ -1,0 +1,67 @@
+🔐 Agent Reliability & Error Handling Strategy – cncpick2
+
+This document defines strategies for ensuring agent robustness, safe recovery, and system fault tolerance across both simulation and hardware deployments.
+
+⸻
+
+🎯 Goals
+	•	Keep agents resilient to partial failures
+	•	Provide observable health signals
+	•	Support restartability and in-place diagnostics
+
+⸻
+
+🧠 Agent Watchdog Expectations
+
+Each agent must:
+	•	Log a startup_complete event
+	•	Periodically emit heartbeat or status_ping
+	•	Log internal errors with tracebacks
+
+Example heartbeat:
+
+{
+  "event": "agent_heartbeat",
+  "agent": "motion_agent",
+  "timestamp": 1234567890.0,
+  "status": "ok"
+}
+
+
+⸻
+
+❗ Error Types
+
+Type	Response Mechanism
+G-code Failures	Log error, retry or halt sequence
+Missing Detection	Timeout → scoring reassessment
+Pickup Timeout	Trigger missed pickup event
+Invalid Lane	Log + discard event or reclassify
+
+
+⸻
+
+🔄 Restartability
+	•	Agents read partial state from cache/logs on restart
+	•	Motion agent resumes from ready_position
+	•	Vision agent auto-syncs to live feed
+	•	Data logging agent appends logs
+
+⸻
+
+🧪 Health Monitoring
+	•	Future: safety_agent monitors all heartbeats
+	•	Unresponsive agent → auto log + retry handler
+	•	Dashboard shows red/yellow/green statuses
+
+⸻
+
+💥 Crash Isolation
+	•	One agent failing should not halt others
+	•	ZMQ channel isolation ensures event flow continuity
+
+⸻
+
+📌 Summary
+
+This reliability plan ensures each agent is fault-tolerant, testable under stress, and provides the necessary telemetry and logs to support debugging, auto-recovery, and safe restarts during both development and production.

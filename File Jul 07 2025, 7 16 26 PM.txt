@@ -1,0 +1,56 @@
+🧭 Lane Mapping Strategy – cncpick2
+
+This document details how the system determines which lane an object is in from image data, and how that maps to CNC motion plans.
+
+⸻
+
+🎯 Purpose
+	•	Convert image-space positions into physical CNC-aligned lane indices
+	•	Ensure synchronized motion planning between vision and motion agents
+
+⸻
+
+🧠 Vision Agent Role
+	•	Captures RGB image and depth
+	•	Uses detection pixel coordinates (bounding box or center)
+	•	Translates horizontal pixel position → lane index
+	•	Emits object_detected with lane assignment (e.g., lane: 2)
+
+⸻
+
+🧰 Lane Definition Options
+	1.	Static Mapping (config-based)
+	•	Define pixel ranges per lane in config:
+
+lane_map:
+  0: [0, 160]
+  1: [161, 320]
+  2: [321, 480]
+  3: [481, 640]
+
+
+	2.	Dynamic Mapping (calibration-based)
+	•	Camera calibration aligns image plane to CNC coordinate system
+	•	Lane zones projected from physical positions to image bounds
+	•	Auto-tuned via test grid pattern or lane markings
+
+⸻
+
+🔁 Runtime Behavior
+	•	Lane assignments are used by:
+	•	scoring_agent to queue objects by lane
+	•	motion_agent to align pickup to lane offset
+	•	trigger_agent to filter by expected lane
+
+⸻
+
+🧪 Testing & Visualization
+	•	Optional debug overlays
+	•	Static test frames for calibration tuning
+	•	Scenario validation in simulation_scenario_builder
+
+⸻
+
+📌 Summary
+
+Lane mapping connects computer vision detection to physical actuation. It’s foundational for coordination between vision, scoring, trigger, and motion logic in cncpick2.

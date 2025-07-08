@@ -1,0 +1,54 @@
+🔁 Real-vs-Simulation Transition Guide – cncpick2
+
+This guide documents how to transition between simulation mode and real hardware mode for testing and deployment.
+
+⸻
+
+🎯 Purpose
+	•	Ensure architectural parity between simulated and live execution
+	•	Identify what changes between test and production environments
+
+⸻
+
+⚙️ Configuration Flags
+	•	Set in config/system.yaml
+
+sim_mode: true  # set to false for real hardware
+
+Agents respond to this flag and swap:
+	•	Real GRBL vs grbl_driver_agent
+	•	Real RGBD camera vs simulated frames
+	•	Real timing vs spawn schedule
+
+⸻
+
+🧱 Swappable Components
+
+Component	Sim Version	Real Version
+Motion Controller	grbl_driver_agent	Serial to GRBL controller
+RGBD Input	simulated_frame_feed	OAK-D camera pipeline
+Spawn Events	JSON scenario	Object detection only
+Trigger Signals	Sim frame timestamps	Real camera zone watchers
+
+
+⸻
+
+🧪 Matching Logic
+	•	Same agents and message formats used
+	•	Same vision pipeline (YOLO, depth, lane map)
+	•	Motion agent uses real Z heights regardless of mode
+	•	Logging agent behaves identically in both cases
+
+⸻
+
+🔄 Deployment Swaps
+	1.	Set sim_mode: false
+	2.	Replace camera inputs in vision_agent
+	3.	Connect GRBL USB path to motion_agent
+	4.	Disable simulator_agent
+
+⸻
+
+📌 Summary
+
+The cncpick2 system is designed to simulate full agent logic in test environments. This guide ensures seamless migration to hardware with minimal reconfiguration and guarantees behavioral consistency through shared formats and modular design.

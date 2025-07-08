@@ -1,0 +1,72 @@
+👷 Developer Onboarding Checklist – cncpick2
+
+A step-by-step checklist for new developers joining the cncpick2 project. This ensures all contributors can run, test, and understand the agent-based system from day one.
+
+⸻
+
+✅ Environment Setup
+	•	Install Python 3.10+
+	•	Install poetry or pipenv
+	•	Clone repository and install dependencies:
+
+poetry install  # or pipenv install
+
+
+	•	Install system packages (ZeroMQ, OpenCV, NumPy, etc.)
+	•	Optional: Install Docker if using isolated simulation containers
+
+⸻
+
+📦 File & Folder Structure
+	•	Review agents/ – each core/future agent is a standalone module
+	•	Review config/ – includes YAML configs per agent
+	•	Review tests/ – includes test_runner.py, logs, scenarios
+	•	Review assets/ – sample data, models, simulated frames
+
+⸻
+
+🧪 Running the Simulation
+	•	Run the test_runner.py sanity test:
+
+python tests/test_runner.py
+
+
+	•	Confirm that all 5 phases complete with no failed assertions
+	•	Explore generated logs under tests/logs/
+
+⸻
+
+🔍 Key Agent Responsibilities
+	•	motion_agent – controls CNC arm and pickup G-code
+	•	vision_agent – detects objects and computes pickup metadata
+	•	trigger_agent – detects when object reaches pickup zone
+	•	scoring_agent – assigns best available object to motion
+	•	data_logging_agent – logs all messages to JSONL/SQLite
+	•	simulator_agent – spawns synthetic object flows
+
+⸻
+
+🛠️ Local Dev Tips
+	•	Use sim_mode=true in config to test without real hardware
+	•	Modify tests/scenarios/ for custom spawn logic
+	•	Add debug prints or use built-in event summaries
+
+⸻
+
+🧠 Understanding Flow
+	•	Review the logic map in /docs/logic_map.md
+	•	Follow event sequence: spawn → detect → assign → trigger → pickup → drop
+
+⸻
+
+📌 Final Checklist
+	•	Can run sanity test end to end
+	•	Understand each agent’s role
+	•	Can locate and read system logs
+	•	Know where to modify configs and agents
+
+⸻
+
+🎉 Welcome!
+
+You’re now ready to contribute to cncpick2. Let a core dev know if you need access to camera data, real GRBL hardware, or advanced test scenarios.

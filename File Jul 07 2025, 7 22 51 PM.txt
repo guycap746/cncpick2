@@ -1,0 +1,63 @@
+🔄 Recovery Agent Design – cncpick2
+
+This document outlines the optional recovery_agent, responsible for initiating recovery procedures after faults, halts, or manual override events.
+
+⸻
+
+🎯 Purpose
+	•	Restart agent tasks after a safety halt or fault
+	•	Attempt to restore in-progress operations
+	•	Reset system to a known good state after error
+
+⸻
+
+📥 Inputs
+	•	halt_all from safety_agent
+	•	manual_recover from CLI tools
+	•	Cached state files from agents (if enabled)
+
+⸻
+
+🔁 Recovery Actions
+
+Target Agent	Recovery Behavior
+motion_agent	Move to ready_position, clear G-code queue
+scoring_agent	Reload object list from cache
+trigger_agent	Reset trigger detection buffers
+vision_agent	Resync camera feed + detection stream
+
+
+⸻
+
+🧠 Logic Flow
+	1.	Detect recovery trigger
+	2.	Load /state/* cache files (if available)
+	3.	Validate timestamps for consistency
+	4.	Issue resume_from_recovery events:
+
+{
+  "event": "resume_from_recovery",
+  "agent": "recovery_agent",
+  "target": "motion_agent",
+  "timestamp": 1234567890.0
+}
+
+
+⸻
+
+🔐 Safeguards
+	•	Will not activate if GRBL still offline
+	•	Requires safety_agent clearance (no active fault)
+	•	Agents must log recovered = true on success
+
+⸻
+
+🧪 Simulation Mode
+	•	Used in chaos testing to re-enable flow after injected faults
+	•	Tracks number of successful recoveries per session
+
+⸻
+
+📌 Summary
+
+The recovery_agent is a future-proofing module for safely resuming operation after interruptions. It supports full or partial recovery, enabling long simulation runs, hardware uptime, and fault injection stress tests.

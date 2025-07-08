@@ -1,0 +1,66 @@
+🎯 Scenario File Format – cncpick2
+
+This document defines the JSON structure used to drive synthetic test cases in simulation mode via simulator_agent.
+
+⸻
+
+🧠 Purpose
+	•	Describe a predefined sequence of objects to simulate
+	•	Control timing, lane placement, and object types
+	•	Enable repeatable testing of specific logic paths
+
+⸻
+
+📄 File Example: tests/scenarios/sanity_test.json
+
+{
+  "scenario_name": "Sanity Test",
+  "description": "One object per lane, staggered by 0.5s",
+  "spawn_sequence": [
+    {"time": 0.0, "lane": 0, "type": "green", "area": 1400},
+    {"time": 0.5, "lane": 1, "type": "green", "area": 1350},
+    {"time": 1.0, "lane": 2, "type": "green", "area": 1600},
+    {"time": 1.5, "lane": 3, "type": "green", "area": 1500}
+  ]
+}
+
+
+⸻
+
+🧾 Field Definitions
+	•	time: float (seconds from test start)
+	•	lane: integer (0–3)
+	•	type: object class label (e.g., “green”, “scrap”, “target”)
+	•	area: estimated pixel area (used to match detection)
+	•	Optional fields: id, depth_mm, height_mm for advanced tests
+
+⸻
+
+📦 Directory Structure
+
+/tests/
+  └── scenarios/
+      ├── sanity_test.json
+      ├── edge_case_overlap.json
+      └── missed_pickup_window.json
+
+
+⸻
+
+🔄 Usage
+	•	Loaded by simulator_agent during system startup
+	•	Used to drive object spawns in headless mode
+	•	Can be linked to assert hooks in test_runner.py
+
+⸻
+
+🧪 Best Practices
+	•	Use evenly spaced timings for easy testing
+	•	Avoid placing multiple objects on same lane within same second (unless stress testing)
+	•	Validate lane IDs against vision camera field of view
+
+⸻
+
+📌 Summary
+
+Scenario files are structured JSON documents that make the simulator deterministic and testable. They ensure repeatability and simplify agent debugging by controlling synthetic object flows.

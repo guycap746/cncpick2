@@ -1,0 +1,51 @@
+🔁 Simulator Playback System – cncpick2
+
+This document outlines the design for a playback tool that re-runs previous logged simulation sessions for debugging, visualization, and comparison purposes.
+
+⸻
+
+🎯 Purpose
+	•	Replay historical sessions frame-by-frame
+	•	Compare different detection or scoring strategies
+	•	Debug misbehaving agents or missed pickups
+
+⸻
+
+📥 Input Requirements
+
+Source File	Contents
+logs/session_*.jsonl	Full event timeline
+frames/*.png	Optional RGB overlays (if exported)
+calibration/*.json	Camera-to-CNC transform matrix
+
+
+⸻
+
+🖼️ Playback Features
+
+Feature	Description
+Time scrubbing	Play/pause or jump to timestamp
+Agent annotation view	See who made each decision
+Overlay visualization	Detection boxes, lanes, pickup zones
+Comparison mode	Side-by-side vs alternate config run
+
+
+⸻
+
+🧰 Implementation Tools
+	•	streamlit or PyQt for UI
+	•	JSONL parser with frame lookup hooks
+	•	Use same vision overlay tools for continuity
+
+⸻
+
+📦 Output Options
+	•	Save annotated video clips
+	•	Export discrepancy reports (e.g., assigned vs missed)
+	•	Frame export for notebook review
+
+⸻
+
+📌 Summary
+
+The simulator playback system enables powerful retrospective analysis of system behavior, essential for debugging, training data refinement, and tuning YOLO/assignment logic over time.

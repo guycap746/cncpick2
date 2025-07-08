@@ -1,0 +1,150 @@
+🧪 Simulation Harness Guide – cncpick2
+
+This guide explains how to run the simulation environment, feed test scenarios, validate agent behavior, and switch between simulation and real hardware configurations.
+
+⸻
+
+📂 Project Folder Expectations
+
+/tests
+  /logs
+  /scenarios
+    sanity_test.json
+  test_runner.py
+  assert_helpers.py
+
+/config
+  sim_config.yaml
+  real_config.yaml
+
+/agents
+  simulator_agent.py
+  vision_agent.py
+  motion_agent_1.py
+  trigger_agent_1.py
+  ...
+
+
+⸻
+
+🚀 Launching the Simulation
+
+To launch the full simulation pipeline:
+
+python tests/test_runner.py --scenario tests/scenarios/sanity_test.json
+
+The test runner:
+	•	Loads the test scenario
+	•	Launches required agents (in sim mode)
+	•	Feeds test data into the simulator_agent
+	•	Validates results using assert_helpers
+	•	Writes logs and summary output
+
+⸻
+
+🧪 Test Scenarios
+
+Scenarios are defined in /tests/scenarios/*.json. Example:
+
+[
+  {"object_id": "uuid1", "lane": 0, "delay_ms": 1000},
+  {"object_id": "uuid2", "lane": 1, "delay_ms": 1500}
+]
+
+	•	delay_ms is the delay before object enters simulated vision range
+	•	Lane determines motion agent targeting
+
+⸻
+
+🧾 Logging Output
+
+All agent PUB messages are collected by data_logging_agent, and saved to:
+	•	/tests/logs/sanity_test_full.jsonl
+	•	/tests/logs/results_summary.json
+
+Sample log entry:
+
+{
+  "event": "object_detected",
+  "agent": "vision_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid1",
+    "lane": 2,
+    "height_mm": 32.1,
+    "area_px": 3112
+  }
+}
+
+
+⸻
+
+✅ Validating Simulation
+
+The assert_helpers.py module validates:
+	•	Object was spawned by simulator
+	•	Detection contains lane + height
+	•	Correct assignment from scoring agent
+	•	Pickup and drop events occurred in correct order
+
+Run results:
+	•	Print validation results to terminal
+	•	Write summary counts to JSON:
+
+{
+  "object_spawned": 2,
+  "object_detected": 2,
+  "object_assigned": 2,
+  "object_picked": 2,
+  "object_dropped": 2
+}
+
+
+⸻
+
+🔁 Switching Between Sim and Real
+
+Configuration file: /config/sim_config.yaml
+
+hardware_mode: sim
+camera_input: fake_rgbd
+grbl_device: sim_driver
+vacuum_control: gcode_m8_m9
+
+Set hardware_mode: real for live CNC + camera systems. This affects:
+	•	grbl_driver_agent
+	•	camera_input interface
+	•	Logging behavior (can increase verbosity for real hardware)
+
+⸻
+
+⚙️ CI Integration
+
+The simulation can be run in CI:
+
+- name: Run Simulation Sanity Test
+  run: |
+    python tests/test_runner.py --scenario tests/scenarios/sanity_test.json
+
+
+⸻
+
+📌 Tips
+	•	Use small test cases first (one object per lane)
+	•	Confirm motion_agent_ready signals return to scoring_agent
+	•	Inspect missed objects via post_pick_monitor_agent
+
+⸻
+
+🚧 Planned Enhancements
+	•	Visual simulation playback tool
+	•	Scenario generator CLI tool
+	•	Support for noisy detections and failure injection
+
+⸻
+
+This guide ensures all developers and testers can:
+	•	Understand how the simulation works
+	•	Modify and create their own scenarios
+	•	Reproduce issues with consistent input
+	•	Validate system correctness in isolation from hardware

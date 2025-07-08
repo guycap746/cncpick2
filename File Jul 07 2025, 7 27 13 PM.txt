@@ -1,0 +1,68 @@
+🛠️ Pickup G-code Template & Safety Design – cncpick2
+
+This document outlines the structure of the pickup sequence used by motion agents to generate safe and synchronized G-code for physical or simulated CNC arms.
+
+⸻
+
+🔧 Purpose
+	•	Define safe pickup motions using vacuum gripper
+	•	Sync with conveyor movement
+	•	Include Z-safe heights and vacuum control
+
+⸻
+
+📄 G-code Template
+
+G90 ; absolute positioning
+G0 X{pickup_x} Y{pickup_y} Z{safe_z} ; move above object
+G1 Z{pickup_z} F500 ; lower to object height
+M8 ; vacuum ON
+G4 P0.5 ; small delay to ensure grip
+G1 Z{safe_z} F500 ; lift object
+G0 X{drop_x} Y{drop_y} ; move to bin
+G1 Z{drop_z} ; lower to drop point
+M9 ; vacuum OFF
+G1 Z{safe_z} ; lift after drop
+G0 X{home_x} Y{home_y} ; return to ready position
+
+
+⸻
+
+📏 Parameters Injected
+
+Placeholder	Source	Description
+{pickup_x}	lane mapper	CNC-space X of target object
+{pickup_y}	lane center	Y-lane center
+{pickup_z}	vision height	Z-depth (compensated)
+{drop_x}	config	Bin location
+{safe_z}	config	Z height above objects
+{home_x/y}	config	Central resting position
+
+
+⸻
+
+⚠️ Safety Rules
+	•	Always return to safe Z before XY moves
+	•	Never move laterally while at pickup Z
+	•	Only perform vacuum ON below safe_z
+	•	All speeds capped in config
+
+⸻
+
+🧠 Agent Use
+	•	motion_agent injects coordinates at runtime
+	•	Fills in config parameters and object height from metadata
+	•	Sends line-by-line G-code to GRBL or grbl_driver_agent
+
+⸻
+
+🧪 Simulation Mode
+	•	Pickup coordinates printed/logged for verification
+	•	grbl_driver_agent simulates delay and confirms move
+	•	Vacuum ON/OFF logged as simulated events
+
+⸻
+
+📌 Summary
+
+This G-code plan allows real or simulated pickup of vision-targeted objects using safety-first motion routines and parameterized commands. Fully injectable at runtime by the motion agent.

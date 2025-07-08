@@ -1,0 +1,56 @@
+⚙️ Performance Tuning Guide – cncpick2
+
+This document outlines the strategies, metrics, and tuning parameters used to optimize system throughput, latency, and resource usage across simulation and real deployments.
+
+⸻
+
+🎯 Optimization Goals
+	•	Maximize good-object pickups per minute
+	•	Minimize missed assignments and motion idle time
+	•	Keep CPU, memory, and latency within safe bounds
+
+⸻
+
+🧪 Key Metrics to Monitor
+
+Metric	Source
+Objects detected / second	vision_agent
+Time from detect → assign	scoring_agent
+Time from assign → pickup	motion_agent
+Motion idle %	metrics_agent
+Frame latency (sim mode)	simulator_agent
+Queue length warnings	scoring_agent
+
+
+⸻
+
+🔧 Tunable Parameters
+
+Parameter	Default	Description
+G-code speed (XY, Z)	300 mm/s	CNC arm travel speeds
+Belt speed	35 fpm	Affects trigger and motion delay
+Vision FPS	15–30	Controls detection responsiveness
+Lane spacing	100 mm	Impacts arm travel time
+Trigger lookahead	300 ms	Pre-trigger window for match
+Motion queue max size	2	Prevents overcommitment
+
+
+⸻
+
+🧠 Optimization Tactics
+	•	Profile event logs from data_logging_agent
+	•	Use compare_results.py on different tunings
+	•	Visually inspect overlay artifacts for late/early motion
+
+⸻
+
+🚦 Stress Testing Modes
+	•	Inject extra objects via simulator_agent
+	•	Simulate missed triggers or dropped frames
+	•	Evaluate FPS vs pickup quality tradeoffs
+
+⸻
+
+📌 Summary
+
+This guide ensures the cncpick2 system can be tuned for max performance in simulation and hardware while remaining observable, testable, and correct.

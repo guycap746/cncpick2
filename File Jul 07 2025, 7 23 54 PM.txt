@@ -1,0 +1,63 @@
+🎨 Simulator Visual Overlay Planning – cncpick2
+
+This document outlines the planned features for visual debugging and playback of simulation scenarios, helping developers understand agent logic through overlaid imagery.
+
+⸻
+
+🎯 Purpose
+	•	Provide a visual inspection tool for simulation runs
+	•	Render what the vision agent “saw”
+	•	Show real-time overlays of object IDs, lanes, triggers, and pickups
+
+⸻
+
+🖼️ Output Mode
+	•	Generates annotated frames as:
+	•	PNG sequence: /overlay_frames/frame_000123.png
+	•	Optional: Live window display (OpenCV)
+	•	Final export:
+	•	video.mp4 via ffmpeg
+
+⸻
+
+🧠 Rendered Overlays
+
+Layer	Data Source
+Bounding Boxes	vision_agent
+Object IDs	scoring_agent
+Lane Zones	lane_mapper config
+Trigger Events	trigger_agent logs
+Pickup Markers	motion_agent
+Missed Objects	post_pick_monitor
+
+
+⸻
+
+🛠️ Tools
+	•	OpenCV + matplotlib for rendering
+	•	Color-coded per lane or outcome
+	•	Legend overlay for interpretation
+
+⸻
+
+🔄 Synchronization
+	•	Matches logs to camera timestamps
+	•	Frame rendering queue reads from data_logging_agent
+	•	All overlays must respect the frame’s simulated timestamp
+
+⸻
+
+📦 File Layout
+
+/sim_vis/
+  ├── frames/
+  ├── overlays/
+  ├── exports/
+  └── logs/
+
+
+⸻
+
+📌 Summary
+
+The visual overlay system provides a powerful tool for verifying simulation correctness, debugging lane and scoring logic, and creating reproducible test visualizations for future comparison or stakeholder demos.

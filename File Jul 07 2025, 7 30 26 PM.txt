@@ -1,0 +1,76 @@
+🔄 Future Agent Profile: recovery_agent – cncpick2
+
+This document outlines the concept of a recovery_agent responsible for detecting system stalls or failure modes and attempting automatic resolution.
+
+⸻
+
+🧠 Agent Overview
+	•	Monitors for motion failures, missed triggers, or long delays
+	•	Detects stalled agents, jammed objects, or repeated failures
+	•	Attempts to reset motion or notify human operator
+	•	Optional but useful for autonomous resilience in unattended operation
+
+⸻
+
+📂 Responsibilities
+	1.	Monitor time elapsed since object assignment or trigger request
+	2.	Detect timeouts or unexpected gaps in event sequence
+	3.	Issue resets, reassignments, or escalation events
+
+⸻
+
+📥 Subscribed Events
+	•	object_assigned
+	•	object_ready_for_pickup
+	•	object_picked
+	•	motion_agent_ready
+
+⸻
+
+⚠️ Timeout Tracking
+	•	Starts timer on assignment
+	•	Expects pickup to occur within configured time window
+	•	Flags if:
+	•	Trigger never arrived
+	•	Pickup failed silently
+	•	Motion agent never returned to ready
+
+⸻
+
+🔧 Configuration Example
+
+recovery_agent:
+  pickup_timeout_sec: 10
+  trigger_timeout_sec: 5
+  enable_soft_reset: true
+
+
+⸻
+
+📤 Recovery Actions
+
+recovery_event
+
+{
+  "event": "recovery_event",
+  "payload": {
+    "type": "timeout",
+    "agent": "motion_agent_1",
+    "object_id": "uuid4"
+  }
+}
+
+
+⸻
+
+🛠️ Optional Capabilities
+	•	Revoke stale assignments and return object to queue
+	•	Request jog move to clear pickup area
+	•	Notify external operator system via alert
+
+⸻
+
+📌 Summary
+	•	Watches for systemic failure patterns
+	•	Helps return system to functional state after faults
+	•	Recommended for long-running unattended deployments

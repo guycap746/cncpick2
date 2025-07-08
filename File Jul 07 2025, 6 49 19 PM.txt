@@ -1,0 +1,133 @@
+🤖 AI Development Instructions by Agent – cncpick2
+
+This document outlines targeted instructions for AI developers (human or model-assisted) working on the cncpick2 project. Each section corresponds to a specific agent and includes a self-contained task description.
+
+⸻
+
+1. simulator_agent
+
+You are now focusing on implementing the simulator_agent in the cncpick2 project. This agent simulates physical objects entering the conveyor belt and emits the initial object_spawned message.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	simulation_agent_design.txt
+	•	sanity_test_workflow.txt
+
+Ensure you:
+	•	Periodically spawn synthetic objects
+	•	Assign object_id, spawn_time, position, and lane
+	•	Emit object_spawned messages
+	•	Operate on a test timer or pre-seeded flow sequence
+
+⸻
+
+2. vision_agent
+
+You are now focusing on implementing the vision_agent in the cncpick2 project. This agent simulates YOLO detection using RGB/depth input and emits object_detected messages.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	lane_mapping_strategy.txt
+	•	sanity_test_workflow.txt
+
+Ensure you:
+	•	Detect object class, size, and height
+	•	Infer lane based on bounding box
+	•	Emit object_detected messages
+	•	Include height_mm and area_px in output
+
+⸻
+
+3. scoring_agent
+
+You are now focusing on implementing the scoring_agent in the cncpick2 project. This agent receives object detection events from vision_agent and assigns the best candidate to an available motion_agent. Your output should follow the messaging format defined in the project and be traceable by the data_logging_agent.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	sanity_test_workflow.txt
+	•	development_plan_phase1_to_5.txt
+
+Ensure you:
+	•	Maintain a ranked object queue
+	•	Assign objects fairly and efficiently
+	•	Emit object_assigned messages with assigned_to field
+	•	Avoid race conditions when multiple motion agents are present
+
+⸻
+
+4. motion_agent_X
+
+You are now focusing on implementing the motion_agent in the cncpick2 project. This agent executes pickup and drop motion sequences based on assigned objects.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	sanity_test_workflow.txt
+
+Ensure you:
+	•	Accept assigned object_id and lane
+	•	Move to pickup location using simulated or GRBL driver
+	•	Request and wait for trigger confirmation
+	•	Run G-code to activate vacuum, pick, and drop object
+	•	Emit object_picked, object_dropped, and motion_ready
+
+⸻
+
+5. trigger_agent
+
+You are now focusing on implementing the trigger_agent in the cncpick2 project. This agent watches the pickup zone and confirms when the assigned object has arrived.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	sanity_test_workflow.txt
+
+Ensure you:
+	•	Monitor each lane continuously
+	•	Match object detection to area and lane
+	•	Emit object_ready_for_pickup to the waiting motion_agent
+
+⸻
+
+6. grbl_driver_agent
+
+You are now focusing on implementing the grbl_driver_agent in the cncpick2 project. This agent receives G-code from motion agents and returns execution status.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	development_plan_phase1_to_5.txt
+
+Ensure you:
+	•	Accept and execute G-code commands
+	•	Simulate CNC motion when in test mode
+	•	Provide “ok”, “error”, and completion responses
+
+⸻
+
+7. post_pick_monitor_agent
+
+You are now focusing on implementing the post_pick_monitor_agent in the cncpick2 project. This agent monitors for objects that pass through the pickup zone without being picked up.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+
+Ensure you:
+	•	Track all previously detected object_ids
+	•	Identify unpicked or missed objects
+	•	Emit object_passed_through or object_missed
+
+⸻
+
+8. data_logging_agent
+
+You are now focusing on implementing the data_logging_agent in the cncpick2 project. This agent records all system messages to structured logs for debugging and replay.
+
+Please read these documents before coding:
+	•	detailed_logic_map
+	•	sanity_test_workflow.txt
+	•	assert_helpers.py
+	•	test_runner.py
+
+Ensure you:
+	•	Subscribe to all ZeroMQ message channels
+	•	Write JSONL or SQLite logs with timestamps
+	•	Include agent name and event in each entry
+	•	Store summaries and allow playback support

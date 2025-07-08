@@ -1,0 +1,208 @@
+📨 Message Protocol Specification – cncpick2
+
+This document defines the messaging formats exchanged between agents via ZeroMQ, including event payloads, required fields, and message types.
+
+⸻
+
+📡 Message Structure Standard
+
+All messages must follow this base schema:
+
+{
+  "event": "event_name_or_command_type",
+  "agent": "sending_agent_name",
+  "timestamp": "ISO8601 or epoch",
+  "payload": { ... }  // event-specific data
+}
+
+	•	All PUB messages must include event, agent, and timestamp
+	•	The payload field should contain event-specific metadata
+	•	For REQ/REP patterns, use type instead of event (e.g., G-code command)
+
+⸻
+
+🟩 Event: object_spawned
+
+Agent: simulator_agent
+
+{
+  "event": "object_spawned",
+  "agent": "simulator_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 1
+  }
+}
+
+
+⸻
+
+🟢 Event: object_detected
+
+Agent: vision_agent
+
+{
+  "event": "object_detected",
+  "agent": "vision_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 1,
+    "class": "green_target",
+    "height_mm": 32.1,
+    "area_px": 3044
+  }
+}
+
+
+⸻
+
+🟡 Event: object_assigned
+
+Agent: scoring_agent
+
+{
+  "event": "object_assigned",
+  "agent": "scoring_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "assigned_to": "motion_agent_1"
+  }
+}
+
+
+⸻
+
+🧭 Event: object_ready_for_pickup
+
+Agent: trigger_agent
+
+{
+  "event": "object_ready_for_pickup",
+  "agent": "trigger_agent_1",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 2
+  }
+}
+
+
+⸻
+
+🤖 Event: object_picked
+
+Agent: motion_agent
+
+{
+  "event": "object_picked",
+  "agent": "motion_agent_1",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid"
+  }
+}
+
+
+⸻
+
+📦 Event: object_dropped
+
+Agent: motion_agent
+
+{
+  "event": "object_dropped",
+  "agent": "motion_agent_1",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "drop_location": "bin_1"
+  }
+}
+
+
+⸻
+
+📉 Event: object_missed
+
+Agent: post_pick_monitor_agent
+
+{
+  "event": "object_missed",
+  "agent": "post_pick_monitor_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 3
+  }
+}
+
+
+⸻
+
+🔁 Event: motion_agent_ready
+
+Agent: motion_agent
+
+{
+  "event": "motion_agent_ready",
+  "agent": "motion_agent_1",
+  "timestamp": "...",
+  "payload": {
+    "status": "idle"
+  }
+}
+
+
+⸻
+
+🧪 Command: G-code Execution Request
+
+Agent: motion_agent → grbl_driver_agent
+
+{
+  "type": "gcode_execute",
+  "agent": "motion_agent_1",
+  "timestamp": "...",
+  "payload": {
+    "commands": ["G1 X100 Y200 Z-10", "M8", "G1 Z0", "M9"]
+  }
+}
+
+Response:
+
+{
+  "type": "gcode_ack",
+  "agent": "grbl_driver_agent",
+  "timestamp": "...",
+  "payload": {
+    "status": "ok"
+  }
+}
+
+
+⸻
+
+🔍 Logging Events (internal)
+
+Agent: data_logging_agent
+	•	Listens to all events, stores each message in full
+	•	Schema identical to full message envelope
+
+⸻
+
+✅ Message Protocol Summary
+
+This protocol defines:
+	•	Clear sender/receiver expectations
+	•	Schema for each message type
+	•	Envelope standardization for all event and command traffic
+
+It enables simulation and real-world switching, ensures clarity for debugging, and supports agent decoupling.
+
+Future extensions will add fields like:
+	•	confidence, temperature, duration_ms, etc.
+
+Next up: per-agent behavior specs or test scenario builder.

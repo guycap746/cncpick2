@@ -1,0 +1,53 @@
+🧭 Calibration Visualizer Tool – cncpick2
+
+This document outlines a visual tool that supports calibration efforts by showing the relationship between camera-detected points and CNC coordinate space.
+
+⸻
+
+🎯 Purpose
+	•	Validate accuracy of the affine transform mapping
+	•	Allow human inspection of calibration outliers
+	•	Make calibration process transparent and repeatable
+
+⸻
+
+📥 Input Sources
+
+File	Description
+calibration/raw_points.json	CNC ↔ Camera coordinate pairs
+calibration/calib_matrix.json	Final computed affine transform
+
+
+⸻
+
+🧰 Features
+
+Feature	Description
+Scatter plot: camera vs CNC	Show alignment of known calibration pairs
+Error vector lines	Draw delta from projected to true points
+Residual summary	Display RMSE and max error
+Real-time recalibration	Refit matrix and preview error live
+
+
+⸻
+
+📦 Technologies
+	•	matplotlib or plotly for 2D/3D scatter
+	•	streamlit or standalone script UI
+	•	Optionally export calibration QA report as PDF or PNG
+
+⸻
+
+🧪 Sample Output
+
+RMSE: 1.13 mm
+Max error: 2.9 mm
+Outliers: 1 (above 3.0 mm)
+Suggested refit: YES
+
+
+⸻
+
+📌 Summary
+
+The calibration visualizer tool supports debugging and validation of the core transform between vision and CNC space, ensuring that the cncpick2 system maintains accuracy during setup, relocation, or hardware changes.

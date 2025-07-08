@@ -1,0 +1,95 @@
+🚦 Agent Profile: trigger_agent – cncpick2
+
+This document defines the role, messaging, and lane-specific behavior of the trigger_agent, which detects when an assigned object reaches the pickup zone.
+
+⸻
+
+🧠 Agent Overview
+	•	Monitors visual input at a single lane pickup zone
+	•	Waits for request from motion agent to monitor for a specific object
+	•	Detects object arrival (based on lane + area + timing)
+	•	Notifies motion agent when object is under pickup position
+
+Example Name:
+
+trigger_agent_2  (for Lane 2)
+
+
+⸻
+
+📂 Responsibilities
+	1.	Wait for monitor_object request from motion_agent
+	2.	Begin checking for object match at its pickup zone
+	3.	Confirm match on visual trigger (e.g., via bounding box)
+	4.	Publish object_ready_for_pickup
+
+⸻
+
+📥 Subscribed Commands
+
+monitor_object
+
+{
+  "type": "monitor_object",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 2,
+    "area_px": 3112
+  }
+}
+
+
+⸻
+
+📤 Published Events
+
+object_ready_for_pickup
+
+{
+  "event": "object_ready_for_pickup",
+  "payload": {
+    "object_id": "uuid"
+  }
+}
+
+
+⸻
+
+🎯 Matching Logic
+	•	Trigger agent uses visual input (e.g. cropped RGB)
+	•	Looks for YOLO box matching:
+	•	Correct lane
+	•	Approximate area match
+	•	May have lane-specific tolerance margin (±10%)
+	•	Optionally checks depth alignment in future
+
+⸻
+
+⚙️ Configuration
+
+trigger_agent_2:
+  lane: 2
+  match_tolerance: 0.1
+  camera_input: "pickup_cam_2"
+
+
+⸻
+
+🧪 Sanity Test Expectation
+	•	For each object_assigned, there must be a corresponding object_ready_for_pickup
+	•	Agent must only trigger on request
+
+⸻
+
+🔁 Lifecycle Summary
+	1.	Idle until monitor_object
+	2.	Active scan using pickup-zone camera
+	3.	Match found → send event to motion agent
+	4.	Reset and return to idle
+
+⸻
+
+📌 Summary
+	•	Each trigger agent monitors one pickup zone
+	•	Bridges timing gap between detection and actual pickup
+	•	Provides essential synchronization for physical motion

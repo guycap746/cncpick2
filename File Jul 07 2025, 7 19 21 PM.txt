@@ -1,0 +1,61 @@
+⚙️ Test Automation Frameworks – cncpick2
+
+This document outlines strategies and utilities for automated testing of the cncpick2 system, covering both sanity-level and advanced behavioral testing across agents.
+
+⸻
+
+🎯 Objectives
+	•	Catch regressions early in simulation and hardware logic
+	•	Validate agent roles, message structure, and timing
+	•	Enable repeatable, structured dev workflow
+
+⸻
+
+🧪 Test Types
+
+Type	Description
+Sanity Tests	Step-by-step verification of object flow
+Integration Tests	Verify agents working together as expected
+Load Tests	Simulate high-throughput scenarios
+Chaos Tests	Inject faults to verify resilience & safety
+Regression Tests	Replay old logs to confirm logic stability
+
+
+⸻
+
+🧰 Tools
+	•	test_runner.py: Main harness
+	•	assert_helpers.py: Shared logic for hook validation
+	•	sample_logs/: Fixture examples and comparison sets
+	•	Optional: pytest integration for coverage reporting
+
+⸻
+
+🧠 Hooks & Validation
+
+Each test phase uses agent-logged events to assert proper state:
+
+assert event['agent'] == 'scoring_agent'
+assert event['event'] == 'object_assigned'
+
+Hooks include:
+	•	After object spawn
+	•	After YOLO detection
+	•	After scoring decision
+	•	After motion pickup/drop
+
+⸻
+
+🔁 Test Profiles
+
+Profile	Purpose
+standard_throughput	Mixed-object scenario for benchmarks
+lane_conflict	Multiple items in one lane
+timeout_fallbacks	Missed pickups and error paths
+
+
+⸻
+
+📌 Summary
+
+The testing framework ensures that development across agents remains coordinated, auditable, and safe for expansion into real hardware. All tests can be run continuously during CI, or interactively by developers in simulation.

@@ -1,0 +1,58 @@
+🧪 Simulation Agent Design – cncpick2
+
+This document outlines the structure, purpose, and behavior of the simulation agent responsible for mimicking real-world hardware events.
+
+⸻
+
+🎯 Purpose
+	•	Replace real cameras, CNCs, and sensors with controlled virtual equivalents
+	•	Provide synthetic data to downstream agents
+	•	Enable safe and repeatable testing for development and CI
+
+⸻
+
+🏗️ Responsibilities
+	1.	Object Spawning
+	•	Emit object_spawned events at controlled intervals
+	•	Vary object class, position, and size (lane-spaced or randomized)
+	2.	Mock RGB + Depth Feeds
+	•	Simulate camera streams to vision_agent
+	•	Optionally feed pre-recorded frames or synthetic images
+	3.	Trigger Zone Simulation
+	•	Simulates downstream object presence for trigger_agent
+	•	Emulates motion across conveyor and zone entry
+	4.	GRBL Driver Emulation
+	•	grbl_driver_agent mirrors GRBL command responses
+	•	Simulates move times, G-code acknowledgment, and vacuum toggling
+
+⸻
+
+📦 Output Messages
+	•	object_spawned → to vision_agent
+	•	pickup_ready → to trigger_agent
+	•	motion_acknowledged → to motion_agent (via driver)
+
+⸻
+
+⚙️ Configurable Inputs
+
+scenario:
+  object_types: [green_circuit, blue_clip]
+  lanes: 4
+  drop_interval_ms: 1500
+  size_noise: true
+  use_depth: true
+
+
+⸻
+
+🧪 Test Harness Integration
+	•	Hooks into sanity test suite
+	•	Scenario builder outputs mock sequences
+	•	Agent logs events for timeline replay
+
+⸻
+
+📌 Summary
+
+The simulation agent allows full-stack verification of cncpick2 workflows before any physical hardware is present. It ensures the vision, trigger, scoring, and motion logic can operate end-to-end under controlled conditions.

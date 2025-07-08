@@ -1,0 +1,68 @@
+🚢 Release Engineering & Versioning Strategy – cncpick2
+
+This document defines the structure, conventions, and automation pipeline for versioning, tagging, and releasing stable builds of the cncpick2 system.
+
+⸻
+
+🎯 Purpose
+	•	Ensure stability and traceability across development and deployment
+	•	Provide repeatable release processes and rollback ability
+	•	Track feature growth vs simulation fidelity
+
+⸻
+
+🔖 Versioning Scheme
+	•	Format: vMAJOR.MINOR.PATCH (SemVer)
+	•	Examples:
+	•	v1.0.0: First complete simulation test suite
+	•	v1.1.0: Adds GRBL driver hardware layer
+	•	v2.0.0: Supports full multi-CNC coordination
+
+⸻
+
+🧱 Git Branches
+
+Branch	Role
+main	Stable release with tagged versions
+dev	Integration of merged features
+feature/*	Experimental or scoped work
+
+
+⸻
+
+📦 Artifacts & Bundles
+
+Artifact	Contents
+cncpick2.zip	Core agents, tests, config, README
+release-notes.md	Changes and migration notices
+docker-compose.yml	Multi-agent deployment profile (optional)
+
+
+⸻
+
+🔁 CI/CD Pipeline
+	•	Pre-release checklist:
+	•	✅ All sanity tests passing
+	•	✅ No agent with error in last 10 min
+	•	✅ Config snapshot committed
+	•	GitHub Actions (or similar):
+	•	Run tests
+	•	Tag release
+	•	Package artifacts
+	•	Push to release bucket / archive
+
+⸻
+
+🔐 Stability Classes
+
+Class	Description
+alpha	Unstable / in-development
+beta	Feature-complete, needs testing
+stable	Ready for production or delivery
+
+
+⸻
+
+📌 Summary
+
+A robust release workflow helps cncpick2 scale, debug safely, and distribute versions with full traceability for simulator or physical deployments.

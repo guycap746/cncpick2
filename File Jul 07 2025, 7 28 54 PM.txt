@@ -1,0 +1,99 @@
+⚙️ Configuration Schema Guide – cncpick2
+
+This document outlines the expected fields and formats for all YAML configuration files in the cncpick2 project.
+
+⸻
+
+📁 Global System Config (config/system.yaml)
+
+system:
+  sim_mode: true
+  log_path: "tests/logs/"
+  frame_rate: 30
+  camera_resolution: [640, 480]
+
+
+⸻
+
+🤖 Agent Configs
+
+Each agent has its own config file under config/agents/.
+
+vision_agent.yaml
+
+vision_agent:
+  input_camera: "oak_d_cam"
+  yolo_model: "models/green_yolo.pt"
+  depth_enabled: true
+  lane_mapper: "assets/lane_map.json"
+
+motion_agent_N.yaml
+
+motion_agent:
+  lane_id: 1
+  grbl_port: "/dev/ttyUSB0"
+  pickup_z_offset_mm: 0.5
+  bin_drop_position: [200, 50, 20]
+  vacuum_on_gcode: "M8"
+  vacuum_off_gcode: "M9"
+
+trigger_agent_N.yaml
+
+trigger_agent:
+  lane: 1
+  match_tolerance: 0.1
+  camera_input: "pickup_cam_1"
+
+scoring_agent.yaml
+
+scoring_agent:
+  scoring_weights:
+    size: 1.0
+    confidence: 0.8
+    crowding_penalty: 0.4
+
+data_logging_agent.yaml
+
+data_logging_agent:
+  log_path: "tests/logs/"
+  output_format: ["jsonl", "summary"]
+  verbose: false
+
+simulator_agent.yaml
+
+simulator_agent:
+  scenario: "tests/scenarios/sanity_test.json"
+  repeat: false
+  frame_rate: 30
+  simulation_speed: 1.0
+
+
+⸻
+
+🧪 Test Runner Config (tests/test_runner.yaml)
+
+test_runner:
+  sanity_mode: true
+  assert_hooks:
+    - hook_after_spawn
+    - hook_after_detection
+    - hook_after_assignment
+    - hook_after_pickup
+    - hook_after_drop
+
+
+⸻
+
+📌 Notes
+	•	All YAML files are auto-loaded by each agent at launch
+	•	sim_mode flag switches real vs. sim behavior across agents
+	•	Future agents will extend this schema with new fields
+
+⸻
+
+✅ Summary
+
+This config schema ensures:
+	•	Predictable agent behavior
+	•	Environment flexibility
+	•	Clear division between logic and settings

@@ -1,0 +1,90 @@
+🧪 Agent Profile: simulator_agent – cncpick2
+
+This document describes the simulator agent, which generates synthetic objects, triggers virtual camera inputs, and mimics conveyor behavior for full-system testing.
+
+⸻
+
+🧠 Agent Overview
+	•	Acts as the synthetic input generator for the system
+	•	Mimics object spawning on conveyor belts across lanes
+	•	Supports multiple scenario modes (sanity test, throughput test, randomized)
+	•	Used in development, CI, and simulation harness
+
+⸻
+
+📂 Responsibilities
+	1.	Emit object_spawned messages at configurable intervals
+	2.	Assign ground truth metadata (lane, ID, size)
+	3.	Sync spawned objects to vision_agent input timeline
+	4.	Notify when all test objects have been spawned
+
+⸻
+
+📤 Published Events
+
+object_spawned
+
+{
+  "event": "object_spawned",
+  "timestamp": "...",
+  "agent": "simulator_agent",
+  "payload": {
+    "object_id": "uuid1",
+    "lane": 1,
+    "class": "green_target",
+    "area_px": 3022
+  }
+}
+
+sim_done
+
+{
+  "event": "sim_done",
+  "payload": {
+    "scenario": "sanity_test"
+  }
+}
+
+
+⸻
+
+📄 Scenario File Format
+
+Scenario files define the order and properties of simulated drops:
+
+[
+  {"object_id": "uuid1", "lane": 0, "delay_ms": 500},
+  {"object_id": "uuid2", "lane": 1, "delay_ms": 600}
+]
+
+
+⸻
+
+⚙️ Configuration Fields
+
+simulator_agent:
+  scenario: "tests/scenarios/sanity_test.json"
+  repeat: false
+  frame_rate: 30
+  simulation_speed: 1.0
+
+
+⸻
+
+🧪 Sanity Test Role
+	•	Defines known object flow and IDs
+	•	Ensures exact match between ground truth and detected
+
+⸻
+
+🧠 Integration Targets
+	•	vision_agent: receives camera feed or synthetic overlays
+	•	data_logging_agent: logs spawn events
+	•	test_runner: listens for sim_done
+
+⸻
+
+📌 Summary
+	•	Replaces physical conveyor + camera in sim mode
+	•	Enables precise test harness behavior
+	•	Powers full system evaluation without hardware

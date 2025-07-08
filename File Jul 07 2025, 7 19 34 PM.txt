@@ -1,0 +1,56 @@
+☁️ Cloud Sync & Backup Strategy – cncpick2
+
+This document outlines methods for backing up, syncing, and optionally sharing system artifacts and configuration data across machines or remote teams.
+
+⸻
+
+🎯 Goals
+	•	Preserve logs, configs, and calibration between sessions
+	•	Allow team-wide sharing of snapshots and results
+	•	Enable external review of test runs and debug data
+
+⸻
+
+🔐 Files to Sync
+
+Category	Example Files
+Logs	logs/session_*.jsonl, SQLite
+Calibration	calibration/calib_matrix.json
+Configs	config/*.yaml
+Test Outputs	tests/logs/*.json, results_summary.json
+Video / Overlay	exports/*.mp4, frames/*.png
+
+
+⸻
+
+🔄 Sync Strategies
+
+Tool	Purpose
+rclone	Drive, Dropbox, or S3 syncing
+rsync	Fast LAN/USB transfers
+zip + upload	Export bundles for email / archive
+GitHub Releases	Optional tagged exports
+
+
+⸻
+
+🔁 Backup Hooks
+	•	on_session_end() callback in test harness
+	•	Compress logs + calibration + summary:
+
+zip results_2025-07-08.zip logs/ calibration/ tests/logs/
+
+	•	Upload to: /backup, S3, or Google Drive
+
+⸻
+
+☁️ Shared Team Modes
+	•	Shared S3 bucket or Drive folder
+	•	Nightly rsync from local device
+	•	Notebook-friendly logs (Jupyter/Colab)
+
+⸻
+
+📌 Summary
+
+A solid cloud sync strategy ensures the cncpick2 project can maintain historical data, collaborate efficiently across machines, and preserve valuable sessions for playback, regression analysis, or audit.

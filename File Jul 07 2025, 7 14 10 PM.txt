@@ -1,0 +1,80 @@
+🔁 CI Pipeline Config – cncpick2
+
+This document defines the structure and goals of a continuous integration (CI) pipeline tailored for the cncpick2 system.
+
+⸻
+
+🎯 Purpose
+	•	Validate all agents build and execute under test
+	•	Ensure regression logic through sanity tests
+	•	Provide structured test output and build logs
+
+⸻
+
+🧰 Recommended Tools
+	•	GitHub Actions (default)
+	•	GitLab CI or CircleCI (optional)
+	•	Python venv or containerized agent launches
+
+⸻
+
+📦 Build & Test Workflow
+
+ci.yaml Sample Steps:
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+
+      - name: Run Sanity Tests
+        run: |
+          python bootstrap.py --profile test_sanity &
+          sleep 5
+          python test_runner.py --profile test_sanity
+
+      - name: Upload Result Summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: sanity-results
+          path: tests/logs/results_summary.json
+
+
+⸻
+
+✅ Coverage
+	•	Agent imports and startup
+	•	Scenario + simulator execution
+	•	Full sanity lifecycle coverage
+	•	Log generation + summary
+
+⸻
+
+🧪 Future CI Features
+	•	Upload annotated logs to dashboard
+	•	Re-run failed scenarios with visual overlay
+	•	Coverage report on agent activity
+
+⸻
+
+📌 Summary
+
+The CI config ensures cncpick2 remains testable and stable with every commit. By running the simulation pipeline, we validate logic and socket flows in a hardware-agnostic way before deployment.

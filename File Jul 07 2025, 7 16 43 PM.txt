@@ -1,0 +1,64 @@
+🚀 Bootstrap Launcher Strategy – cncpick2
+
+This document outlines how the cncpick2 system is initialized using a centralized bootstrap mechanism to ensure repeatable, profile-driven agent orchestration for both simulation and real hardware modes.
+
+⸻
+
+🎯 Purpose
+	•	Launch and wire up all ZeroMQ agent sockets
+	•	Set per-agent config via profile
+	•	Support for simulation, test, and deployment modes
+
+⸻
+
+🧭 Entry Point
+
+python bootstrap.py --profile sim
+
+Profiles available:
+	•	sim – Full simulation
+	•	replay – Playback of logged object flows
+	•	hardware – Physical CNC + live cameras
+	•	test_sanity – Controlled validation test
+
+⸻
+
+⚙️ What It Does
+	1.	Loads config YAML (e.g., config/profiles/sim.yaml)
+	2.	Creates socket bindings for PUB/SUB/REQ/REP/PAIR
+	3.	Spawns each agent in its own async process/thread
+	4.	Passes launch context to each agent (profile, ports)
+	5.	Monitors startup status and logs readiness
+
+⸻
+
+📂 Config Structure
+
+Each profile YAML defines:
+
+agents:
+  vision_agent:
+    type: vision
+    port_pub: 5551
+    port_sub: 5552
+  scoring_agent:
+    type: scoring
+    port_req: 5560
+  motion_agent:
+    type: motion
+    cnc_id: 1
+    driver: grbl_driver_agent
+...
+
+
+⸻
+
+🔁 Reload & Recovery
+	•	Designed to support soft restart via make restart
+	•	Agents monitor heartbeats and can rebind on failure
+
+⸻
+
+📌 Summary
+
+The bootstrap strategy abstracts all low-level setup, socket plumbing, and orchestration. Profiles make it easy to switch between development, simulation, testing, or hardware modes with minimal changes.

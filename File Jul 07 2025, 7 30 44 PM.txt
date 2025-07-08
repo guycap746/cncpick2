@@ -1,0 +1,76 @@
+📊 Future Agent Profile: metrics_agent – cncpick2
+
+This document defines a future metrics aggregation agent that will provide real-time and long-term performance statistics for the cncpick2 system.
+
+⸻
+
+🧠 Agent Overview
+	•	Gathers structured performance metrics across the system
+	•	Computes KPIs: throughput, pickup accuracy, object wait time, assignment latency
+	•	Exposes metrics in a format compatible with dashboards or Prometheus
+
+⸻
+
+📂 Responsibilities
+	1.	Aggregate events from all system agents
+	2.	Maintain real-time counters and moving averages
+	3.	Periodically publish metrics to disk or HTTP endpoint
+
+⸻
+
+📥 Subscribed Events
+	•	object_spawned
+	•	object_detected
+	•	object_assigned
+	•	object_picked
+	•	object_dropped
+	•	object_missed
+
+⸻
+
+📤 Published Stats
+
+Example Metric Frame (JSON or Prometheus text format)
+
+{
+  "timestamp": "...",
+  "throughput_per_minute": 24,
+  "pickup_success_rate": 0.96,
+  "avg_time_to_pickup": 3.42,
+  "missed_pickups": 1
+}
+
+
+⸻
+
+📈 KPIs Tracked
+	•	Total objects seen vs. picked
+	•	Avg time from spawn → detect → assign → pickup
+	•	Lane-based breakdowns
+	•	Rolling error rate per agent
+
+⸻
+
+⚙️ Configuration Fields
+
+metrics_agent:
+  publish_interval_sec: 10
+  output_format: "json"
+  expose_http: true
+  http_port: 9001
+
+
+⸻
+
+🔌 Integration Options
+	•	Can write to:
+	•	metrics/metrics_YYYYMMDD.json
+	•	Web UI (for dashboard)
+	•	Prometheus exporter (future)
+
+⸻
+
+📌 Summary
+	•	Produces performance insights in real time
+	•	Optional but valuable for optimization
+	•	Bridges system behavior with observability dashboards

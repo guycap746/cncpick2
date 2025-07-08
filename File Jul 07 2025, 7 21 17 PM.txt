@@ -1,0 +1,50 @@
+📊 System Visual Dashboard Plan – cncpick2
+
+This document outlines a dashboard interface for real-time visualization and operational awareness across agents, metrics, and event flow in the cncpick2 system.
+
+⸻
+
+🎯 Purpose
+	•	Give developers and operators a live overview of system health
+	•	Track agent behavior, object flow, and errors in real time
+	•	Provide toggles for test scenarios and CLI triggers
+
+⸻
+
+🧩 Dashboard Sections
+
+Section	Features
+Agent Status	Heartbeat lights, uptime counters, mode flags
+Event Timeline	Live scroll of object life cycle: spawn → pickup → drop
+Metrics Panel	Pickup rate, misses, delay histograms
+Trigger Zones	View camera lanes, trigger activations
+Motion Status	CNC positions, queue preview, current target
+Alert Console	GRBL timeouts, missed pickups, unsafe drops
+
+
+⸻
+
+🖼️ Technologies
+	•	streamlit, dash, or flask + plotly
+	•	Uses SUB socket to receive data from data_logging_agent
+	•	Optional: Redis or SQLite cache layer
+
+⸻
+
+🛠️ Toggle Controls
+	•	Enable/disable agents
+	•	Trigger custom events (e.g., test scenarios)
+	•	Adjust vision score weights or trigger lead time
+
+⸻
+
+📦 Deployment
+	•	Runs as dashboard_agent or separate service
+	•	Launch via python dashboard/main.py
+	•	Optional port: 8501 or configurable
+
+⸻
+
+📌 Summary
+
+The visual dashboard provides deep observability, real-time feedback, and debugging leverage for complex coordination across CNC arms, vision, simulation, and scoring logic.

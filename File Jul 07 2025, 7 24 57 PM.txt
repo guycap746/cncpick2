@@ -1,0 +1,54 @@
+♻️ Agent State Caching & Resumption – cncpick2
+
+This document defines optional runtime persistence strategies that allow agents to resume operations after crash, restart, or pause.
+
+⸻
+
+🎯 Purpose
+	•	Enable resuming long simulation runs
+	•	Allow partial recovery in hardware mode
+	•	Avoid losing pick assignments, object metadata, and G-code queues
+
+⸻
+
+🧱 Per-Agent Caching Strategies
+
+motion_agent
+	•	Store last known ready_position
+	•	Save current G-code queue (line buffer)
+	•	Resume from start of pickup if mid-routine crash
+
+scoring_agent
+	•	Cache list of active, unassigned objects
+	•	Record assigned object IDs and their motion targets
+	•	Reassign if pickup_timeout occurs after restart
+
+vision_agent
+	•	Syncs to camera feed on restart
+	•	Reprocesses any objects that were visible at last timestamp
+
+simulator_agent
+	•	Rereads scenario file and fast-forwards to current time
+	•	Optional: checksum last emitted object to avoid dupes
+
+trigger_agent
+	•	Cache recent object seen in trigger zone (lane → timestamp → id)
+
+⸻
+
+💾 Persistence Format
+	•	JSON snapshot every 2–5 seconds per agent
+	•	Default location: /state/{agent_name}_state.json
+
+⸻
+
+🔄 Startup Behavior
+	•	If state file exists, agent loads it
+	•	Logs resumed_from_state = true
+	•	Otherwise, starts fresh
+
+⸻
+
+📌 Summary
+
+This design enables robust partial recovery and continuity for both simulation and real deployments. It ensures agents retain critical knowledge between runs and during unexpected crashes without requiring a centralized database.

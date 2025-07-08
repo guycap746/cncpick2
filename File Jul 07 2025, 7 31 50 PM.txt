@@ -1,0 +1,100 @@
+👀 Agent Profile: post_pick_monitor_agent – cncpick2
+
+This document outlines the behavior and analysis performed by the post-pick monitor agent, which helps verify system performance and missed pickups.
+
+⸻
+
+🧠 Agent Overview
+	•	Monitors camera feed after CNC pickup zone
+	•	Tracks objects that pass without being picked
+	•	Compares detections to original object_detected events
+	•	Logs:
+	•	Missed pickups
+	•	Objects never assigned
+	•	Detection mismatches
+
+⸻
+
+📂 Responsibilities
+	1.	Run YOLO (or same vision logic) post-pickup
+	2.	Attempt to match seen objects to original detections
+	3.	Track:
+	•	Unpicked targets
+	•	False negatives
+	•	Repeated detections
+	4.	Publish optional performance stats
+
+⸻
+
+📥 Subscribed Inputs
+	•	Camera feed (real or sim)
+	•	Optional: reference data from data_logging_agent
+
+⸻
+
+📤 Optional Published Events
+
+object_missed
+
+{
+  "event": "object_missed",
+  "payload": {
+    "object_id": "uuid1",
+    "lane": 2,
+    "reason": "missed_pickup"
+  }
+}
+
+object_never_assigned
+
+{
+  "event": "object_never_assigned",
+  "payload": {
+    "object_id": "uuid2",
+    "lane": 1
+  }
+}
+
+
+⸻
+
+🔍 Matching Logic
+	•	Uses lane, area, and time proximity
+	•	Can compare object classes, shape, and location
+	•	Uses object ID history if linked
+	•	Flags:
+	•	Duplicate sightings
+	•	Low confidence matches
+	•	Unseen expected pickups
+
+⸻
+
+🧪 Sanity Test Role
+	•	Verifies zero false negatives during baseline test
+	•	Ensures no ghost detections appear post-pick
+
+⸻
+
+⚙️ Configuration Fields
+
+post_pick_monitor_agent:
+  camera_input: "post_pickup_cam"
+  enable_comparison: true
+  match_tolerance: 0.12
+  flag_duplicates: true
+
+
+⸻
+
+🧠 Future Enhancements
+	•	Feedback into vision_agent confidence scores
+	•	Data stream to learning_feedback_agent
+	•	Outlier detection
+
+⸻
+
+📌 Summary
+	•	Observes what escapes pickup
+	•	Helps tune detection + scoring pipelines
+	•	Aids in test result accuracy and false-negative detection
+	•	Optional but critical in advanced system tuning

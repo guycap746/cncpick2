@@ -1,0 +1,55 @@
+🖥️ Agent Status Dashboard – cncpick2
+
+This document defines the layout and functionality of a future local dashboard for real-time system monitoring and developer insight.
+
+⸻
+
+🎯 Purpose
+	•	Visualize agent health and state
+	•	Display message rates and last-seen timestamps
+	•	Highlight missed pickups, error trends, and throughput
+	•	Provide test runner and log file summary views
+
+⸻
+
+🧩 Components
+
+Agent Status Grid
+
+Agent	Status	Last Event	Messages/sec
+vision_agent	✅	object_detected	3.5
+motion_agent	✅	object_picked	2.1
+scoring_agent	✅	object_assigned	1.0
+
+Event Timeline
+	•	Scrollable list of events with timestamps, color-coded by type
+
+Metrics Panel
+	•	Pickup success rate
+	•	Missed object count
+	•	Average latency (detect → assign → pickup)
+
+Log Viewer
+	•	Tail data_logging_agent JSONL in real time
+	•	Search + filter by event type
+
+⸻
+
+⚙️ Architecture
+	•	Implemented as a lightweight Python web server using FastAPI + WebSockets
+	•	Frontend: Tailwind CSS + Vanilla JS or React (optional)
+	•	Data source: data_logging_agent writes to shared cache or SQLite
+
+⸻
+
+🔐 Security (Optional)
+	•	Local-only by default (localhost)
+	•	Optional password protection for networked mode
+
+⸻
+
+📌 Summary
+
+This dashboard provides a live window into cncpick2’s agent-based system, helping developers verify correct behavior, debug test failures, and monitor metrics over time.
+
+Can be launched alongside agents or accessed post-run for analysis.

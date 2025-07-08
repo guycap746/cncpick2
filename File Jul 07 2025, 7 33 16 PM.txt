@@ -1,0 +1,103 @@
+👁️ Agent Profile: vision_agent – cncpick2
+
+This document defines the role, behavior, and output of the vision_agent, which performs object detection from RGBD inputs and sends actionable metadata to the system.
+
+⸻
+
+🧠 Agent Overview
+	•	Monitors simulated or real RGB + depth camera inputs
+	•	Performs object detection (e.g., YOLO on green objects)
+	•	Infers lane, area, and object height
+	•	Emits object_detected messages for scoring
+
+Example Name:
+
+vision_agent
+
+
+⸻
+
+📂 Responsibilities
+	1.	Read frames from camera or sim feed
+	2.	Run object detection (YOLO or equivalent)
+	3.	Use pixel position to determine conveyor lane
+	4.	Use depth map to estimate object Z height (mm)
+	5.	Compute area in pixels for quality scoring
+	6.	Publish detection metadata for each object
+
+⸻
+
+📤 Published Events
+
+object_detected
+
+{
+  "event": "object_detected",
+  "agent": "vision_agent",
+  "timestamp": "...",
+  "payload": {
+    "object_id": "uuid",
+    "lane": 2,
+    "class": "green_target",
+    "height_mm": 32.1,
+    "area_px": 3088
+  }
+}
+
+
+⸻
+
+🧩 Supporting Functions
+
+Lane Mapping
+	•	Maps object pixel x to logical lane (0–3)
+	•	Uses calibrated camera-lane map file or lane_mapper utility
+
+Height Estimation
+	•	Uses depth map (Z) for object’s top surface
+	•	May average over center region to smooth out noise
+
+Detection Backend
+	•	Configurable: can use pretrained YOLO, mock boxes, or OpenCV blob detector
+	•	Simulation mode injects known detections for test objects
+
+⸻
+
+⚙️ Configuration Options
+
+vision_agent:
+  input_source: "rgbd_stream"  # or "sim"
+  model: "yolov5"
+  lane_map: "config/lane_mapping.json"
+  min_area_px: 2500
+  max_objects: 10
+
+
+⸻
+
+🧪 Simulation Mode
+	•	Loads frames or synthetic detections from simulator_agent
+	•	Matches timing of real detection pipeline (frame rate, delay)
+	•	Allows deterministic tests with known object sets
+
+⸻
+
+🧾 Logging
+
+Every detection is sent as a PUB message and also consumed by:
+	•	scoring_agent
+	•	data_logging_agent
+	•	post_pick_monitor_agent
+
+⸻
+
+🔍 Sanity Test Checks
+	•	Must emit object_detected after every object_spawned
+	•	Payload must include: lane, area, height, object_id
+
+⸻
+
+📌 Summary
+	•	Translates visual input into actionable metadata
+	•	Allows scoring + motion systems to operate agnostic to camera format
+	•	Central to accurate pickup and lane alignment

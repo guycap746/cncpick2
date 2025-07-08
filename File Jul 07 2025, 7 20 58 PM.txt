@@ -1,0 +1,46 @@
+🛠️ Operator & Maintenance Tools – cncpick2
+
+This document outlines tools and interfaces designed for human operators or field technicians working with the cncpick2 system.
+
+⸻
+
+🎯 Purpose
+	•	Provide accessible ways to calibrate, inspect, and control the system
+	•	Reduce downtime during real-world troubleshooting
+	•	Support minimal training for line operators
+
+⸻
+
+📋 Key Operator Tools
+
+Tool	Function
+Ready Check Utility	Verifies agents are running and communicative
+Manual Jog Panel	Simple UI to jog CNC XYZ via G-code
+Object Inspector	Tap object in overlay to show ID/metadata
+System Pause/Resume	Controlled start/stop of full system
+
+
+⸻
+
+🔧 Maintenance Tools
+
+Tool	Use Case
+Calibration Assistant	Walks technician through camera ↔ CNC mapping
+Error Log Viewer	Shows recent faults and recommendations
+Port Scanner Utility	Lists active GRBL serial devices
+Config Snapshot Saver	Backs up current settings + state
+
+
+⸻
+
+📦 Packaging Format
+	•	GUI Toolkit: PyQt, tkinter, or Web UI (streamlit)
+	•	Launchers:
+	•	python tools/operator_ui.py
+	•	npm run start-ui (if browser-based)
+
+⸻
+
+📌 Summary
+
+This interface layer separates core agent orchestration from real-world interactions, giving operators clarity, manual control, and fault recovery tools without needing developer access.

@@ -1,0 +1,63 @@
+🌍 Remote Monitoring & Telemetry – cncpick2
+
+This document outlines the system hooks and tooling for observing the cncpick2 system from a remote location, focusing on diagnostics, telemetry, and alerting.
+
+⸻
+
+🎯 Purpose
+	•	Enable headless deployments to be observable
+	•	Provide developers and operators with remote insights
+	•	Allow system-wide KPIs to be tracked in real time
+
+⸻
+
+🛰️ Monitored Data Types
+
+Type	Source Agent	Example Metric
+System Heartbeats	all agents	last_seen, uptime
+Motion Events	motion_agent	pickup_time, z_speed
+Detection Events	vision_agent	object_count, frame_rate
+Missed Objects	post_pick_monitor	count_per_lane
+Faults & Alerts	safety_agent	halt_reason, fault_rate
+
+
+⸻
+
+🔌 Export Targets
+
+Method	Use Case
+JSONL stream	Raw audit/event capture
+SQLite file	Debug sessions
+MQTT (future)	Live dashboard or IoT bridge
+REST push	Send to monitoring server or Grafana
+
+
+⸻
+
+📶 Uplink Models
+	•	telemetry_agent (optional module):
+	•	Subscribes to all agent PUB sockets
+	•	Applies filter and rate-limit rules
+	•	Pushes structured payloads remotely
+
+⸻
+
+📊 Suggested KPIs
+	•	Detection → Pickup success rate
+	•	CNC idle time by lane
+	•	Mean pickup delay
+	•	Fault rate by agent type
+	•	Sanity test pass/fail trend
+
+⸻
+
+🧪 Test Setup
+	•	Use telemetry_sim.sh to mock a long run
+	•	Visualize trends with Jupyter or Grafana
+	•	Inject faults to verify reporting
+
+⸻
+
+📌 Summary
+
+Remote telemetry completes the feedback loop for cncpick2 deployments, providing insight during continuous use, regression tests, and performance tuning—even when off-site or embedded in remote enclosures.

@@ -1,0 +1,69 @@
+🧿 GRBL Driver Agent Watchdog – cncpick2
+
+This document describes the fault detection and recovery design for the grbl_driver_agent, which serves as the interface to a physical or simulated GRBL-controlled CNC machine.
+
+⸻
+
+🎯 Purpose
+	•	Ensure motion controller remains responsive
+	•	Detect CNC stalls, disconnects, or invalid responses
+	•	Trigger recovery or escalate to system fault
+
+⸻
+
+⚙️ Monitoring Strategy
+	•	Track acknowledgment of each sent G-code line
+	•	Timeout if no reply within t_max_response seconds
+	•	Retry once (if retry_enabled = true), else halt
+	•	Report failure to:
+	•	motion_agent
+	•	data_logging_agent
+	•	(optional) safety_agent
+
+⸻
+
+🔁 Heartbeat Pings
+
+Every 5 seconds:
+
+{
+  "event": "grbl_heartbeat",
+  "agent": "grbl_driver_agent",
+  "status": "ok",
+  "last_gcode_ack": "G1 Z20.0",
+  "uptime": 43.7
+}
+
+
+⸻
+
+🚨 Failure Events
+
+{
+  "event": "grbl_timeout",
+  "agent": "grbl_driver_agent",
+  "command": "G0 X45 Y33",
+  "timeout_sec": 2.0,
+  "timestamp": 1234567890.0
+}
+
+{
+  "event": "grbl_connection_lost",
+  "agent": "grbl_driver_agent",
+  "port": "/dev/ttyUSB0",
+  "recovery_attempted": true
+}
+
+
+⸻
+
+🧪 Simulation Support
+	•	Sim mode logs simulated ok/error responses
+	•	Real mode uses pyserial or serialport bridge
+	•	Full parity of failure logic in both modes
+
+⸻
+
+📌 Summary
+
+The watchdog ensures the CNC hardware interface remains healthy, responds quickly, and never causes silent system stalls. It supports safe retries, diagnostics, and integration with future safety monitoring agents.

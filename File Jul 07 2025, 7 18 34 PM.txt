@@ -1,0 +1,64 @@
+👨‍💻 Developer Onboarding Guide – cncpick2
+
+This guide is designed to help new contributors quickly understand and begin working with the cncpick2 project.
+
+⸻
+
+📦 Prerequisites
+	•	Python 3.10+
+	•	Git
+	•	Recommended: poetry or venv
+	•	(Optional) Docker
+
+⸻
+
+📁 Project Layout
+
+Folder	Contents
+agents/	All core agent modules
+simulator/	Conveyor + object spawning logic
+tests/	Sanity and stress tests
+logs/	Live logs and JSONL sessions
+calibration/	Transform data and raw reference points
+config/	Lane maps, CNC profiles, agent settings
+
+
+⸻
+
+🚀 Getting Started
+	1.	Clone the repo: git clone git@github.com:your-org/cncpick2.git
+	2.	Install deps:
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+
+	3.	Run a sanity test:
+
+python test_runner.py --profile sanity
+
+
+
+⸻
+
+🧠 Development Tips
+	•	Use data_logging_agent to track all agent communication
+	•	Modify bootstrap.py for quick agent tweaks
+	•	Run individual agents with python agents/vision_agent.py
+	•	Sanity test hooks live in assert_helpers.py
+
+⸻
+
+🧪 Recommended First Tests
+
+Test Name	File	Purpose
+sanity_test	test_runner.py	Validate full flow
+lane_conflict	tests/test_conflict.py	Detects overlapping lanes
+
+
+⸻
+
+📌 Summary
+
+This guide helps new developers install, explore, and test the cncpick2 system with minimal overhead, ensuring they can start contributing quickly and safely.

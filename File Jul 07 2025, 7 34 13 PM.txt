@@ -1,0 +1,103 @@
+🛠️ Hardware Integration Guide – cncpick2
+
+This document explains how the cncpick2 system interfaces with real hardware, including GRBL-controlled CNCs, cameras, and the vacuum gripper.
+
+⸻
+
+🧱 Hardware Components
+
+1. 🧠 CNC Machine
+	•	Controller: GRBL (e.g., FoxAlien Masuter 3S)
+	•	Connected via: USB Serial
+	•	Controlled by: grbl_driver_agent
+	•	Command Language: G-code
+
+2. 📷 Depth Camera
+	•	Type: OAK-D or similar RGB + Depth camera
+	•	Provides:
+	•	RGB frame to vision_agent
+	•	Depth map for height estimation
+	•	Accessed via: Real camera driver OR synthetic image generator in sim mode
+
+3. 🧲 Vacuum Gripper
+	•	Controlled by G-code:
+	•	M8 = Vacuum ON
+	•	M9 = Vacuum OFF
+	•	Executed as part of motion G-code macro
+
+⸻
+
+🤖 GRBL Driver Agent
+
+File: agents/grbl_driver_agent.py
+
+Responsibilities
+	•	Listens for G-code execution commands from motion_agent
+	•	Sends G-code via serial to real GRBL device
+	•	Waits for ok acknowledgements
+	•	In sim mode: fakes delay + sends gcode_ack
+
+Modes
+
+hardware_mode: sim | real
+
+	•	sim: sleeps to simulate motion
+	•	real: opens serial port, streams G-code
+
+Required Config
+
+grbl:
+  port: "/dev/ttyUSB0"
+  baud: 115200
+  timeout: 2
+
+
+⸻
+
+📷 Camera Input Switching
+
+In Real Mode
+	•	Camera driver delivers:
+	•	RGB frames (e.g., via OpenCV or DepthAI)
+	•	Depth maps (in mm)
+
+In Sim Mode
+	•	Loads synthetic frames or mock objects directly
+	•	Emulates vision detection with deterministic output
+
+Vision Agent Logic
+	•	Unchanged regardless of input source
+	•	Processes RGB + depth and outputs detection event
+
+⸻
+
+🧪 Mode Switching via Config
+
+hardware_mode: sim
+camera_input: fake_rgbd
+vacuum_control: gcode_m8_m9
+
+	•	Used by motion, driver, and vision agents
+	•	Ensures the same logic runs in test and real modes
+
+⸻
+
+⚠️ Safety Notes
+	•	Vacuum ON (M8) must only run after Z-lowering
+	•	Ensure machine is homed before first move
+	•	Add emergency stop capability in real setup
+	•	Do not run simulated G-code on a live machine without review
+
+⸻
+
+🛠️ Deployment Checklist
+
+Component	Sim Mode	Real Mode
+grbl_driver	Delay + mock	Serial over USB
+Camera input	Static frames	DepthAI/OpenCV feed
+Vacuum control	G-code mocked	M8/M9 real output
+
+
+⸻
+
+This integration guide ensures cncpick2 runs identically in simulated and real-world deployments with minimal reconfiguration.

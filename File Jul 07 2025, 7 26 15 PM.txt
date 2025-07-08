@@ -1,0 +1,67 @@
+📊 Metrics Agent Design – cncpick2
+
+This document outlines the proposed functionality and outputs of the optional metrics_agent, which calculates system-level performance indicators in real time.
+
+⸻
+
+🎯 Purpose
+	•	Measure efficiency and reliability of the system
+	•	Provide quantitative feedback during test runs
+	•	Aggregate real-time counters and time-based metrics
+
+⸻
+
+📥 Inputs
+
+Listens to events published by other agents:
+	•	object_spawned
+	•	object_detected
+	•	object_assigned
+	•	object_picked
+	•	object_dropped
+	•	object_missed
+	•	unassigned_good_object
+
+⸻
+
+📈 Core Metrics
+
+Metric	Calculation Logic
+Total Objects Spawned	Count of object_spawned
+Detection Rate	detected / spawned
+Assignment Rate	assigned / detected
+Pickup Success Rate	picked / assigned
+Drop Accuracy	Valid dropped matching assigned
+Missed Pickups	Count of object_missed
+Unassigned Good Objects	Count of unassigned_good_object
+Avg. Time: Detect → Assign	Timestamp delta
+Avg. Time: Assign → Pickup	Timestamp delta
+
+
+⸻
+
+🔄 Output Events
+
+{
+  "event": "metric_report",
+  "agent": "metrics_agent",
+  "pickup_success_rate": 0.92,
+  "missed_pickups": 1,
+  "unassigned_good_objects": 3,
+  "timestamp": 1234567890.0
+}
+
+Also writes tests/logs/metrics_summary.json at end of run.
+
+⸻
+
+🧪 Runtime Behavior
+	•	Updates metrics every 1–2 seconds
+	•	Provides snapshot views for dashboards
+	•	Emits summary at end of test if sim_mode: true
+
+⸻
+
+📌 Summary
+
+The metrics_agent enables clear visibility into the internal health and performance of the system. It supports dashboards, developer debugging, and regression tracking across test scenarios.

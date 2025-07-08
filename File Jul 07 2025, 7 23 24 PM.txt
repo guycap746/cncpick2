@@ -1,0 +1,67 @@
+🚀 Deployment Modes & Config Profiles – cncpick2
+
+This document outlines the supported runtime configurations and profiles for simulation, local development, and hardware deployment.
+
+⸻
+
+🎯 Goals
+	•	Define clear environments for testing and production
+	•	Enable agent and device behavior to adjust via shared profiles
+
+⸻
+
+🧩 Supported Modes
+
+Mode	Description	Default Config
+sim	Full simulation with mock drivers	sim_config.yaml
+hybrid	Real motion + simulated vision	hybrid_config.yaml
+hardware	Full hardware, all live agents	prod_config.yaml
+
+
+⸻
+
+📁 File Layout
+
+/config/
+  ├── sim_config.yaml
+  ├── hybrid_config.yaml
+  └── prod_config.yaml
+
+
+⸻
+
+⚙️ Sample Config Schema
+
+sim_mode: true
+motion:
+  driver: grbl_driver_agent
+  ready_position: [300, 200, 50]
+camera:
+  source: simulator
+  resolution: [640, 480]
+  fps: 30
+scoring:
+  weights:
+    confidence: 0.4
+    area: 0.6
+
+
+⸻
+
+🧠 Mode Switching Behavior
+	•	CLI arg or env var: --profile sim or export CNC_PROFILE=sim
+	•	bootstrap.py loads correct file and distributes config to all agents
+	•	Agents adjust behavior based on received profile_name and flags
+
+⸻
+
+🔐 Production Safeguards
+	•	prod_config.yaml disables destructive CLI tools
+	•	Enables serial port checks and heartbeat watchdogs
+	•	Requires explicit confirmation to overwrite logs
+
+⸻
+
+📌 Summary
+
+This modular profile strategy ensures clean isolation between test, hybrid, and hardware deployments. It improves developer ergonomics, prevents accidental misuse of production hardware, and aligns all agents to a single configuration source.

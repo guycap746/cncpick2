@@ -1,0 +1,108 @@
+🛠️ cncpick2 Development Plan (Phase 1–5)
+
+This plan outlines the staged development of the cncpick2 system from simulation to real hardware integration, based on your finalized logic map and document set.
+
+⸻
+
+✅ PHASE 1: Code Skeleton Setup
+
+🎯 Goal: Initialize base system with agent stubs, ZeroMQ config, message schema, and test harness.
+
+Tasks:
+	•	Setup src/agents/, src/core/, src/tests/, and config/ structure
+	•	Create base AgentSocket or ZMQAgent class
+	•	Define global message schema with required fields
+	•	Implement test_runner.py with profile-based launcher
+	•	Wire up assert_helpers.py and data logger stubs
+
+⸻
+
+✅ PHASE 2: Agent-by-Agent Development (Sim Mode)
+
+🎯 Goal: Implement each core agent as a testable unit using simulated input.
+
+Agents to implement:
+	•	simulator_agent: Emits object_spawned
+	•	vision_agent: Simulates YOLO + RGB/depth feed
+	•	scoring_agent: Assigns best object to picker
+	•	motion_agent_X: Executes simulated pickup sequence
+	•	trigger_agent: Watches for object arrival
+	•	data_logging_agent: Captures full event log
+
+Deliverables:
+	•	Stubs responding to events
+	•	Hooked into test_runner
+	•	Message tracing working end-to-end
+
+⸻
+
+✅ PHASE 3: Full Lifecycle Flow
+
+🎯 Goal: Validate object lifecycle from spawn to drop using only simulation components.
+
+Flow:
+	1.	Sim spawns object
+	2.	Vision detects + emits
+	3.	Scoring assigns
+	4.	Motion plans + requests trigger
+	5.	Trigger confirms pickup zone
+	6.	Motion executes pickup + drop
+
+Validations:
+	•	object_spawned, object_detected, object_assigned, object_ready_for_pickup, object_picked, object_dropped, motion_ready
+	•	All events logged by data_logging_agent
+	•	Assertions pass at each stage
+
+⸻
+
+✅ PHASE 4: Multi-Lane & Post-Pick Tracking
+
+🎯 Goal: Handle 4 lanes and start error detection feedback loop.
+
+Enhancements:
+	•	Run multi-object stream across 4 simulated lanes
+	•	Refine lane_mapper accuracy
+	•	Implement post_pick_monitor_agent
+	•	Detect objects that passed pickup zone
+	•	Recheck YOLO detections
+
+Deliverables:
+	•	Missed pickup detection
+	•	Multi-agent lane handling
+	•	Object queue pruning + timeouts
+
+⸻
+
+✅ PHASE 5: Hardware Integration Mode
+
+🎯 Goal: Enable GRBL CNC and live camera feeds.
+
+Changes:
+	•	Use profile: hardware_grbl.yaml
+	•	Swap:
+	•	simulator_agent → disabled
+	•	vision_agent → uses OAK-D RGBD stream
+	•	motion_agent → talks to physical GRBL
+	•	trigger_agent → live zone detection from second cam
+
+Keep:
+	•	data_logging_agent, post_pick_monitor_agent, test_runner
+
+⸻
+
+✅ Priority Order for Development
+
+Priority	Component	Notes
+1	simulator_agent	Drives system
+2	vision_agent	Enables detection pipeline
+3	scoring_agent	Core assignment logic
+4	motion_agent (sim)	Runs pickup motion + drop
+5	trigger_agent	Pickup validation handoff
+6	data_logging_agent	Debug + audit
+7	grbl_driver_agent (sim)	Simulates CNC response
+8	post_pick_monitor_agent	Feedback loop, optional for Phase 4
+
+
+⸻
+
+Ready to begin Phase 1 or generate your folder and file templates?

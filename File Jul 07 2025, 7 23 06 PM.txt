@@ -1,0 +1,66 @@
+🛡️ Safety Agent Design – cncpick2
+
+This document outlines the future safety_agent, responsible for centralized monitoring, health checks, and emergency halts in both simulation and hardware deployments.
+
+⸻
+
+🎯 Purpose
+	•	Detect agent failures or anomalies
+	•	Monitor GRBL watchdog signals and heartbeat loss
+	•	Provide global halt/alert capabilities
+
+⸻
+
+📥 Inputs
+	•	agent_heartbeat events (all agents)
+	•	grbl_timeout, grbl_connection_lost
+	•	object_missed, pickup_timeout
+	•	metric_report (from metrics_agent)
+
+⸻
+
+⚠️ Triggers
+
+Condition	Response
+Agent heartbeat missed	Alert + optional restart
+Motion timeout	Log + disable CNC motion
+Unusual pickup failure rate	Emit warning event
+GRBL disconnect	Send global halt
+
+
+⸻
+
+🚨 Global Halt Protocol
+
+When triggered:
+	1.	Broadcasts halt_all event
+
+{
+  "event": "halt_all",
+  "agent": "safety_agent",
+  "reason": "grbl lost",
+  "timestamp": 1234567890.0
+}
+
+	2.	Agents receiving this event must enter a safe pause state:
+	•	motion_agent: raise Z, stop queue
+	•	scoring_agent: reject assignments
+	•	trigger_agent: ignore trigger matches
+
+⸻
+
+📋 Reporting
+	•	Writes summary to logs/safety_report.json
+	•	Emits safety_alert events to dashboard
+
+⸻
+
+🧪 Simulation Mode
+	•	Simulates fault conditions (heartbeat drop, timeout injection)
+	•	Enables test coverage of halt propagation logic
+
+⸻
+
+📌 Summary
+
+The safety_agent offers a centralized fail-safe mechanism for detecting malfunctions, responding to critical errors, and coordinating safe system shutdowns. It supports robust testing and real-world deployments where safety is paramount.

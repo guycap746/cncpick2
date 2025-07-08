@@ -1,0 +1,60 @@
+🧠 AI Learning Feedback Agent Design – cncpick2
+
+This document outlines the proposed design of an experimental learning_feedback_agent, intended for future development to improve detection and scoring quality using real-time system outcomes.
+
+⸻
+
+🎯 Purpose
+	•	Monitor real-world pickup results
+	•	Learn from missed pickups, reassignments, and false detections
+	•	Recommend lane adjustments, scoring weights, or YOLO fine-tuning
+
+⸻
+
+📥 Inputs
+	•	Event bus messages:
+	•	object_assigned
+	•	object_picked
+	•	object_missed
+	•	object_not_assigned
+	•	object_detected
+	•	pickup_success_rate (metrics agent)
+	•	Access to vision metadata and post-pick logs
+
+⸻
+
+🧪 Feedback Domains
+
+Domain	Signal Type	Actionable Change
+Lane Mapping	Missed by lane	Adjust x_min/x_max thresholds
+Vision Model	False positives/neg	Refine YOLO annotations
+Scoring Logic	Low-quality pick success	Tune weights on area/confidence
+
+
+⸻
+
+🔄 Output
+	•	Logs to learning_feedback_agent.log
+	•	learning_recommendation events
+
+{
+  "event": "learning_recommendation",
+  "agent": "learning_feedback_agent",
+  "recommendation": "Decrease lane 2 x_min by 10px",
+  "confidence": 0.87,
+  "source": "missed_pickup"
+}
+
+
+⸻
+
+🚧 Deployment
+	•	Disabled by default
+	•	Only active in simulation or training mode
+	•	May later inform adaptive scoring or model retraining
+
+⸻
+
+📌 Summary
+
+The AI feedback agent is designed as a future-facing enhancement to enable continuous improvement of lane mapping, detection, and scoring logic by learning from operational results in simulation and deployment.

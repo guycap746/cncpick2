@@ -1,0 +1,65 @@
+🧪 Test Case Utilities – cncpick2
+
+This document describes helper scripts and design strategies to manage and automate the creation, execution, and validation of test cases.
+
+⸻
+
+🎯 Purpose
+	•	Simplify creation of valid spawn sequences
+	•	Enable automated regression testing
+	•	Link scenario files to result validation hooks
+
+⸻
+
+🛠️ Core Utilities
+
+make_scenario.py
+	•	Script to generate .json scenario files
+	•	Options:
+	•	--lanes 4
+	•	--spacing 0.5
+	•	--object_types green,scrap
+	•	--count 20
+	•	Outputs to tests/scenarios/
+
+run_scenario.py
+	•	Launches agents with scenario config
+	•	Calls test_runner.py after completion
+	•	Logs summary to tests/results/
+
+compare_results.py
+	•	Compares two runs to detect regressions:
+	•	Total pickups
+	•	Missed objects
+	•	Unassigned good objects
+	•	Runtime duration
+	•	Highlights differences in stdout
+
+⸻
+
+📦 Directory Layout
+
+/tests/
+  ├── scenarios/
+  ├── logs/
+  ├── results/
+  └── tools/
+      ├── make_scenario.py
+      ├── run_scenario.py
+      └── compare_results.py
+
+
+⸻
+
+🧪 Usage Examples
+
+python tools/make_scenario.py --lanes 4 --count 16
+python tools/run_scenario.py --file tests/scenarios/sanity_test.json
+python tools/compare_results.py --baseline results/batch1.json --test results/batch2.json
+
+
+⸻
+
+📌 Summary
+
+These tools make it easy to generate controlled inputs, run end-to-end tests, and compare results automatically, forming the backbone of cncpick2’s test and evaluation pipeline.

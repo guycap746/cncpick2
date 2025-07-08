@@ -1,0 +1,66 @@
+🗂️ Filesystem & Deployment Layout – cncpick2
+
+This document describes the project folder layout, expected directory contents, and agent deployment considerations.
+
+⸻
+
+📦 Root Directory Structure
+
+cncpick2/
+├── agents/                  # Source code for each agent
+├── assets/                  # Models, lane maps, test overlays
+├── config/                  # YAML configs for system + agents
+│   ├── system.yaml
+│   └── agents/
+├── docs/                    # Design specs and internal documentation
+├── tests/                   # Test runner, scenarios, and logs
+│   ├── scenarios/
+│   ├── logs/
+│   └── test_runner.py
+├── utils/                   # Helper modules (assert_helpers.py, zmq_tools.py)
+├── requirements.txt / pyproject.toml  # Python dependency file
+└── README.md
+
+
+⸻
+
+🧠 Deployment Rules
+	•	Agents are launched from within agents/
+	•	Use config/agents/{agent_name}.yaml for each instance
+	•	Shared global settings live in config/system.yaml
+	•	All logs and output data are saved under tests/logs/
+
+⸻
+
+⚙️ Runtime Environment
+	•	Recommended: poetry, pipenv, or virtualenv
+	•	Each agent loads its config on startup
+	•	ZMQ-based PUB/SUB handles agent communication via localhost or container bridge
+
+⸻
+
+🧪 Simulation Overlay
+
+During sim mode:
+	•	simulator_agent spawns synthetic objects
+	•	vision_agent receives synthetic frames
+	•	grbl_driver_agent mocks CNC motion responses
+
+⸻
+
+🪪 Directory Summary
+
+Folder	Purpose
+agents/	Agent source files
+assets/	Vision models, depth maps, camera data
+config/	YAML config files
+tests/	Scenarios, logs, test harness
+utils/	Shared code helpers
+docs/	Internal documentation
+
+
+⸻
+
+📌 Summary
+
+This layout supports modular development, multi-agent launch, test simulation, and production conversion with minimal changes.

@@ -1,0 +1,51 @@
+👷 System Operator’s Quickstart Guide – cncpick2
+
+This quickstart is for factory or testbed operators who will run, monitor, and pause/resume the cncpick2 system without needing to understand internal code.
+
+⸻
+
+🖥️ Basic Controls
+
+Action	Command/Tool
+Start system	python bootstrap.py --profile sim
+Pause system	Dashboard “Pause” button or CTRL+C
+Resume system	Restart command or dashboard toggle
+View dashboard	Open browser at http://localhost:8501
+Stop system	CTRL+C or make stop
+
+
+⸻
+
+📊 Live Monitoring
+	•	Watch lanes, objects, and pickup events in real time
+	•	Heartbeat lights show agent status
+	•	Errors appear in red on the alert console
+
+⸻
+
+🧰 Common Issues
+
+Symptom	Suggestion
+No pickups happening	Check trigger or scoring agent logs
+System freeze	Try make restart, check connections
+Wrong object picked	Calibrate again, inspect lane map
+
+
+⸻
+
+🛠️ Manual Controls (Optional)
+	•	Run python tools/operator_ui.py for jog panel
+	•	Use GRBL sender for direct CNC control (advanced)
+
+⸻
+
+🔒 Safe Shutdown
+	1.	Press CTRL+C in system terminal
+	2.	Confirm all agents report “exit” message in dashboard
+	3.	Close dashboard tab if running
+
+⸻
+
+📌 Summary
+
+This guide lets you run and monitor the cncpick2 system confidently, even without engineering support. Use the dashboard and tools for maximum visibility and control.

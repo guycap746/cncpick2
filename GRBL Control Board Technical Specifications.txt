@@ -1,0 +1,188 @@
+# GRBL Control Board Technical Specifications for FoxAlien Masuter 3S CNC Machine
+
+## GRBL version and board specifications
+
+The FoxAlien Masuter 3S uses a **GRBL v1.1f-based controller** implemented on standard Arduino architecture. The control board features an ATmega328P microcontroller running at 16 MHz, communicating through a CH340 USB-to-serial converter chip.  The board is housed in a custom dust-proof controller box with integrated emergency stop and homing buttons. 
+
+**Key hardware specifications:**
+
+- Microcontroller: ATmega328P (16 MHz, 32KB Flash, 2KB SRAM)
+- USB Interface: CH340 USB-to-serial converter 
+- Motor Control: 4x stepper drivers for NEMA23-76 closed-loop motors 
+- Spindle Control: PWM output for 400W spindle (up to 30,000 RPM) 
+- Input/Output: Limit switch inputs, probe input, emergency stop
+
+## USB serial communication protocol details
+
+The GRBL controller communicates using a straightforward serial protocol with these parameters: 
+
+**Serial Configuration: 115200-8-N-1**
+
+- Baud rate: 115200 bps (fixed, requires firmware recompilation to change) 
+- Data bits: 8
+- Parity: None
+- Stop bits: 1
+- Flow control: None (software-based through character counting)
+
+**Buffer Management:**
+
+- Serial RX buffer: 128 characters maximum  
+- Planner buffer: 16 motion blocks  
+- Line length limit: 127 characters  
+
+The controller supports two streaming protocols. The **send-response protocol** sends one command and waits for “ok” or “error:” before sending the next. The **character-counting protocol** tracks buffer usage to maximize throughput by keeping the 128-character buffer optimally filled. 
+
+## Command acknowledgment and response patterns
+
+GRBL provides deterministic response patterns for reliable communication: 
+
+**Standard Responses:**
+
+- `ok` - Command successfully parsed and executed 
+- `error:XX` - Error occurred with specific error code (1-38) 
+
+**Push Messages:**
+
+- `ALARM:X` - Emergency alarm state (codes 1-10) 
+- `[MSG:text]` - Feedback messages 
+- `<status>` - Real-time status reports 
+
+**Status Report Format:**
+
+```
+<State|Position|Additional_Data>
+```
+
+Example: `<Run|WPos:10.500,5.250,0.000|FS:500.0,8000|Ov:100,100,100>` 
+
+States include: Idle, Run, Hold, Jog, Alarm, Door, Check, Home, Sleep.  Position data shows either machine coordinates (MPos) or work coordinates (WPos), along with feed/spindle speeds and override percentages. 
+
+## Complete G-code command support
+
+The Masuter 3S supports the standard GRBL v1.1 command set: 
+
+**Motion Commands:**
+
+- G0: Rapid positioning (up to 10,000 mm/min) 
+- G1: Linear interpolation with feedrate 
+- G2/G3: Circular interpolation (clockwise/counterclockwise) 
+- G38.2-G38.5: Probe commands 
+
+**Coordinate Systems:**
+
+- G17/G18/G19: Plane selection 
+- G20/G21: Inch/millimeter modes 
+- G53: Machine coordinate movement 
+- G54-G59: Work coordinate systems 
+- G90/G91: Absolute/incremental positioning 
+- G92: Temporary coordinate offset 
+
+**Other G-codes:**
+
+- G4: Dwell 
+- G10: Set coordinate system data 
+- G28/G30: Go to predefined positions 
+- G43.1: Dynamic tool length offset 
+
+**M-codes:**
+
+- M0/M1: Program pause 
+- M2/M30: Program end 
+- M3/M4/M5: Spindle control (CW/CCW/Stop) 
+- M7/M8/M9: Coolant control 
+- M56: Parking override control
+
+**Real-time Commands (immediate execution):**
+
+- `?`: Status query  
+- `~`: Cycle start/resume  
+- `!`: Feed hold  
+- `Ctrl-X` (0x18): Soft reset  
+- `0x84-0xA1`: Various overrides and toggles 
+
+## Configuration commands ($-commands)
+
+**View Commands:**
+
+- `$$`: View all settings 
+- `$#`: View coordinate parameters 
+- `$G`: View parser state 
+- `$I`: View build info 
+- `$N`: View startup blocks 
+
+**Control Commands:**
+
+- `$H`: Run homing cycle 
+- `$X`: Kill alarm lock 
+- `$C`: Check mode toggle 
+- `$J=`: Jog command 
+
+**Settings ($0-$132):** Each axis has configurable steps/mm, max rate, acceleration, and travel limits. Key settings include step pulse timing, direction inversion, homing parameters, and spindle configuration. 
+
+## FoxAlien-specific implementations
+
+While the Masuter 3S uses standard GRBL v1.1 firmware without proprietary modifications, it includes several machine-specific configurations: 
+
+**Default Configuration Values:**
+
+- $100/$101: 80.0 steps/mm (X/Y axes)
+- $102: 400.0 steps/mm (Z axis)
+- $110/$111: 8000.0 mm/min max rate (X/Y)
+- $112: 1000.0 mm/min max rate (Z)
+- $130/$131: 400.0 mm max travel (X/Y standard, 800mm for extension kit) 
+- $132: 95.0 mm max travel (Z) 
+- $30: 30000 RPM max spindle speed
+
+**Unique Features:**
+
+- Closed-loop stepper motor support (prevents step loss) 
+- Homing to front-left corner at machine coordinates (-377, -377) 
+- Extension kit support requiring `$130=800` setting 
+- Physical homing button on controller box 
+- 400W spindle with manual speed control knob 
+
+## Initialization and homing procedures
+
+**Startup Sequence:**
+
+1. Install CH340 USB driver (required) 
+1. Power on controller box
+1. Connect via USB at 115200 baud 
+1. Send any character to wake GRBL  
+1. Receive: `Grbl 1.1f ['$' for help]` 
+1. Query status with `?`
+1. Execute homing with `$H` or physical button  
+
+**Homing Behavior:**
+
+- Moves to front-left corner in negative X/Y direction
+- Engages limit switches on all axes
+- Sets machine position to (-377, -377, 0) 
+- Pulls off switches by configured distance
+- Ready for work coordinate setting
+
+**Work Coordinate Setup:**
+
+1. Move to desired work origin
+1. Set using G10 or G92 commands 
+1. Use G54 (default) coordinate system 
+1. Z-probe supported for tool height setting
+
+## Error handling and diagnostics
+
+The controller provides comprehensive error reporting with 38 distinct error codes for G-code issues and 10 alarm codes for machine states.   Common errors include invalid commands (error:20), undefined feedrate (error:22), and travel exceeded (error:15). Alarm states cover hard limit triggers, homing failures, and probe errors. 
+
+## Implementation recommendations for simulation
+
+For accurate grbl_driver_agent simulation:
+
+1. **Serial Communication**: Implement 115200-8N1 serial protocol with 128-character RX buffer tracking 
+1. **Command Processing**: Parse incoming commands, validate syntax, and generate appropriate ok/error responses
+1. **State Machine**: Track machine state (Idle, Run, Hold, etc.) and transition based on commands and conditions
+1. **Coordinate Systems**: Maintain machine and work coordinate transformations for G54-G59 
+1. **Motion Planning**: Simulate acceleration/deceleration profiles respecting configured limits
+1. **Real-time Status**: Generate status reports on `?` queries with current position and state
+1. **Error Simulation**: Implement boundary checking and return appropriate error codes
+1. **Buffer Management**: Simulate character-counting protocol for realistic streaming behavior
+
+The FoxAlien Masuter 3S represents a standard GRBL v1.1 implementation with machine-specific configurations rather than firmware modifications, making it compatible with all standard GRBL communication protocols and software  while optimizing for its closed-loop motor system and 400W spindle capabilities. 

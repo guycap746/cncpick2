@@ -1,0 +1,243 @@
+# Design Inconsistencies - Resolutions
+
+This document captures all design inconsistencies found across the cncpick2 documentation and their official resolutions.
+
+## 1. Object ID Generation
+
+**Inconsistency**:
+
+- Some docs suggest simulator generates object_id
+- Others imply vision agent creates object_id
+
+**Resolution**: ✓ Simulator generates object_id, Vision Agent observes and uses it
+
+-----
+
+## 2. Agent Naming Conventions
+
+**Inconsistency**:
+
+- Motion agents sometimes numbered by lane, sometimes by CNC
+- Unclear if trigger agents bound to lanes or CNCs
+
+**Resolution**:
+
+- ✓ Motion agents are named by CNC number (motion_agent_0, motion_agent_1, etc.)
+- ✓ Trigger agents are paired with CNCs (trigger_agent_0 pairs with motion_agent_0)
+- ✓ Each trigger agent can monitor any lane as requested
+
+-----
+
+## 3. Port Configurations
+
+**Inconsistency**:
+
+- Scoring agent port_req shown as 5562 in some docs, 5560 in others
+- Data logging agent sometimes shown with pub port
+
+**Resolution**:
+
+- ✓ Scoring agent port_req: 5562
+- ✓ Data logging agent: Only subscribes (no pub port)
+
+-----
+
+## 4. Timestamp Format
+
+**Inconsistency**:
+
+- Some examples show epoch format (1234567890.123)
+- Others mention ISO8601
+- Some use “…” placeholder
+
+**Resolution**: ✓ Epoch timestamps with millisecond precision (e.g., 1234567890.123)
+
+-----
+
+## 5. Post-Pick Monitor Events
+
+**Inconsistency**:
+
+- Sometimes `object_missed`
+- Sometimes `object_passed_through`
+- Sometimes `object_never_assigned`
+
+**Resolution**: ✓ Two distinct events:
+
+- `object_missed`: Object WAS assigned but pickup failed
+- `object_passed_through`: Object was detected but NEVER assigned
+
+-----
+
+## 6. Motion-to-Trigger Communication
+
+**Inconsistency**:
+
+- Some docs show REQ/REP pattern
+- Others suggest PUB/SUB
+- Unclear event names
+
+**Resolution**: ✓ Full PUB/SUB pattern
+
+- Motion publishes `monitor_request` event
+- Trigger subscribes and filters by its paired motion agent
+- Trigger publishes `object_ready_for_pickup` when ready
+
+-----
+
+## 7. GRBL Driver Agent
+
+**Inconsistency**:
+
+- Unclear if it exists only in simulation or also in real mode
+
+**Resolution**: ✓ GRBL driver agent always exists (provides consistent interface for both sim and real)
+
+-----
+
+## 8. Configuration Structure
+
+**Inconsistency**:
+
+- Some docs show single profile file with all agents
+- Others show separate config files per agent
+
+**Resolution**: ✓ Single profile file per deployment mode (sim.yaml, hardware.yaml, etc.)
+
+-----
+
+## 9. Object Classification Field
+
+**Inconsistency**:
+
+- Sometimes uses `type`
+- Sometimes uses `class`
+- Values vary (“green” vs “green_target”)
+
+**Resolution**: ✓ Use `class` field with simple values like “green”
+
+-----
+
+## 10. Test Scenario Format
+
+**Inconsistency**:
+
+- JSON array format in some docs
+- YAML format with metadata in others
+
+**Resolution**: ✓ YAML format with metadata (scenario_name, description, sequence, repeat)
+
+-----
+
+## 11. Lane Mapping Approach
+
+**Inconsistency**:
+
+- Some docs show only static mapping
+- Others mention dynamic calibration
+
+**Resolution**: ✓ Support both static and dynamic calibration, default to static only
+
+-----
+
+## 12. Object Metadata Requirements
+
+**Inconsistency**:
+
+- `confidence` and `bbox` sometimes included, sometimes not
+- Unclear if required or optional
+
+**Resolution**:
+
+- ✓ `confidence`: Always required (1.0 in simulation)
+- ✓ `bbox`: Optional in all cases
+
+-----
+
+## 13. Safety and Recovery Agents
+
+**Inconsistency**:
+
+- Some docs mark as “future” and “optional”
+- Dev plan shows as P1 priority
+
+**Resolution**: ✓ Safety and Recovery agents are future enhancements (not part of MVP)
+
+-----
+
+## 14. Number of CNCs vs Lanes
+
+**Inconsistency**:
+
+- Unclear if system requires 1:1 mapping
+- Spatial arrangement unclear
+
+**Resolution**:
+
+- ✓ Multiple CNCs arranged in series (behind each other, not side by side)
+- ✓ Each CNC can service all lanes
+- ✓ Numbers independently configurable
+
+-----
+
+## 15. State Persistence
+
+**Inconsistency**:
+
+- Some docs describe JSON state caching
+- Unclear if required or optional
+
+**Resolution**: ✓ State persistence is a future enhancement (not required for initial implementation)
+
+-----
+
+## 16. Lane Height Configuration
+
+**Inconsistency**:
+
+- Some docs suggest lane mapping includes height
+- Vision agent docs show height calculation
+
+**Resolution**:
+
+- ✓ Lane mapping does NOT include height (only X-coordinate ranges)
+- ✓ Belt height determined during calibration and stored in separate calibration file
+
+-----
+
+## 17. Calibration Data Storage
+
+**Inconsistency**:
+
+- Unclear where calibration results are stored
+
+**Resolution**: ✓ Separate dedicated calibration file for vision and CNC calibration data
+
+-----
+
+## 18. Default Number of CNCs
+
+**Inconsistency**:
+
+- Examples show varying numbers of CNCs
+
+**Resolution**: ✓ Default simulation uses 1 CNC
+
+-----
+
+## 19. Duplicate Documents
+
+**Finding**:
+
+- Documents 11 & 16: “Test Automation Frameworks” (identical)
+- Documents 12 & 17: “Cloud Sync & Backup Strategy” (identical)
+- Documents 15 & 20: “Simulator Playback System” (identical)
+- Documents 19 & 24: “Release Engineering & Versioning Strategy” (identical)
+
+**Note**: These are true duplicates with no conflicts. Can be consolidated.
+
+-----
+
+## Summary
+
+These resolutions provide a consistent foundation for implementation. All major architectural decisions have been clarified, and the system design is now internally consistent.

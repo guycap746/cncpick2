@@ -1,0 +1,52 @@
+📜 Changelog & Roadmap – cncpick2
+
+This document tracks major changes, milestones, and planned features for the cncpick2 project.
+
+⸻
+
+✅ Completed Milestones
+
+v0.1.0 – Simulation Foundation
+	•	Multi-agent design established with ZeroMQ
+	•	Object spawner and lane-aware belt simulator
+	•	Vision agent with YOLO detection and depth
+	•	Scoring and CNC motion routing logic
+	•	Trigger agent with match-on-area confirmation
+	•	GRBL driver agent for simulated CNC interface
+	•	Post-pick monitoring for missed object detection
+	•	Data logging agent (JSONL + SQLite)
+
+v0.2.0 – Test Framework + Dashboard
+	•	Full sanity test runner + assertion hooks
+	•	Test profiles for conflict and throughput
+	•	Streamlit dashboard UI for system visualization
+	•	Simulator playback + calibration tools
+	•	Developer onboarding and operator quickstart
+	•	Cloud sync, telemetry, and backup systems
+
+⸻
+
+🚧 In Progress
+	•	Multi-CNC coordination support (n=4 pickers)
+	•	Lane map inference + CNC alignment accuracy
+	•	End-to-end YOLO model swapper for benchmarking
+	•	Fault injection / recovery agent
+
+⸻
+
+🔮 Future Roadmap
+
+Feature	Description
+Adaptive Scoring	ML-based object selection tuning
+Recovery Agent	Retry logic for missed or dropped objects
+Test Case Generator	Rule-based or random test input synthesis
+Cloud Dashboard	Remote web portal for status + KPIs
+Auto-labeler Integration	Export frames and labels for re-training
+Fleet Sync Layer	Share logic + calibration across CNC setups
+
+
+⸻
+
+📌 Summary
+
+The cncpick2 system continues to expand its simulation realism, hardware fidelity, and intelligent automation layer. This changelog helps track progress and prioritize upcoming capabilities.

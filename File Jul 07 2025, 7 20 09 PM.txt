@@ -1,0 +1,62 @@
+🚀 Deployment Automation Tools – cncpick2
+
+This document outlines a strategy and tooling approach for deploying the cncpick2 system in both simulation and physical environments using repeatable automation.
+
+⸻
+
+🎯 Purpose
+	•	Eliminate manual deployment steps
+	•	Consistently provision all required agents and dependencies
+	•	Support dev, sim, and production profiles
+
+⸻
+
+🧰 Tooling Stack
+
+Tool	Role
+Makefile	Common commands (make run-sim)
+Docker	Containerized agent environments
+docker-compose	Multi-agent orchestration (optional)
+bash	Lightweight entrypoint wrappers
+requirements.txt / pyproject.toml	Python deps mgmt
+
+
+⸻
+
+🧱 Project Structure Example
+
+/scripts/
+  ├── launch_sim.sh
+  ├── launch_hardware.sh
+  └── teardown.sh
+/Dockerfile
+/docker-compose.yml
+/Makefile
+
+
+⸻
+
+⚙️ Makefile Examples
+
+run-sim:
+	python bootstrap.py --profile sim
+
+run-hardware:
+	python bootstrap.py --profile hardware
+
+docker-build:
+	docker build -t cncpick2 .
+
+
+⸻
+
+🌐 Optional Cloud Targets
+	•	GitHub Codespaces (sim only)
+	•	Railway or Heroku (dashboard + logs)
+	•	AWS EC2 AMI prebuild for motion/vision combo
+
+⸻
+
+📌 Summary
+
+Deployment automation ensures cncpick2 environments can be launched consistently, tested continuously, and scaled easily from local machines to cloud-based or embedded deployments.

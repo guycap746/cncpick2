@@ -1,0 +1,53 @@
+🧰 Real-Time CLI Tools – cncpick2
+
+This document outlines optional terminal-based tools that support debugging, manual overrides, and real-time insights during development or deployment.
+
+⸻
+
+🎯 Goals
+	•	Enable direct interaction with active agents
+	•	Provide visibility into system status
+	•	Allow developers to send manual events or override logic
+
+⸻
+
+🧪 Tool: cli_agent_control.py
+
+A command-line utility that connects to the ZeroMQ bus and provides an interactive REPL or argument-based interface.
+
+Features
+	•	Query current agent status (status, heartbeat, last_event)
+	•	Send manual commands:
+	•	pause_agent("motion_agent")
+	•	resume_agent("scoring_agent")
+	•	inject_event({custom_payload})
+	•	Watch live logs filtered by agent or event type
+	•	Trigger test scenarios on demand
+
+⸻
+
+📋 Tool: log_tail.py
+
+Tail and filter recent events in data_logging_agent output.
+	•	Arguments:
+	•	--agent motion_agent
+	•	--event object_picked
+	•	--since 10s
+
+⸻
+
+⚙️ Architecture
+	•	Built using argparse, zmq, and optionally prompt_toolkit for interactive UI
+	•	Uses PUB/SUB or REQ/REP channels depending on mode
+
+⸻
+
+🔐 Access Control (Optional)
+	•	Require passphrase for destructive commands
+	•	Block inject_event in production config
+
+⸻
+
+📌 Summary
+
+These real-time CLI tools serve developers and testers working with cncpick2 to better understand runtime behaviors, issue manual overrides, and rapidly diagnose problems without restarting the system.

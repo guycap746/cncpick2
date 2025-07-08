@@ -1,0 +1,75 @@
+🚀 System Boot Sequence – cncpick2
+
+This document outlines the standard startup order and dependencies for agents in the cncpick2 project.
+
+⸻
+
+🧠 Overview
+
+The system is designed to initialize in a loosely-coupled, fault-tolerant manner. Agents use pub/sub and internal queues, allowing startup in any order once dependencies are met.
+
+⸻
+
+🔁 Suggested Boot Order
+
+1. data_logging_agent
+	•	Must start first to capture all subsequent events
+
+2. simulator_agent (if sim mode)
+	•	Begins object spawning
+	•	Also sends sim_done at test completion
+
+3. vision_agent
+	•	Needs camera feed (simulated or real)
+	•	Must start before detections can occur
+
+4. scoring_agent
+	•	Waits for detections and agent ready signals
+
+5. motion_agent_N
+	•	Initializes motion controller or simulated GRBL driver
+	•	Sends motion_agent_ready when idle
+
+6. trigger_agent_N
+	•	Awaits lane-specific monitor_object calls
+
+7. (Optional) post_pick_monitor_agent
+	•	Observes missed objects
+
+8. (Optional) metrics_agent, recovery_agent, safety_agent
+	•	Subscribe to existing message bus events
+	•	Can be safely started late
+
+⸻
+
+⚙️ Environment Detection
+
+Each agent reads from shared config:
+
+system:
+  sim_mode: true
+
+Agents adapt based on sim_mode, using mock hardware or simulated input streams.
+
+⸻
+
+🕓 Timing Dependencies
+	•	Motion agent must not block waiting for vision to assign
+	•	Vision must wait for camera readiness
+	•	Logging should never be skipped
+
+⸻
+
+✅ Startup Checklist
+	•	sim_mode properly configured in config
+	•	Logging agent confirmed running
+	•	Motion agents return motion_agent_ready
+	•	Spawn events observed within 2s of simulator launch
+	•	Vision detects and publishes object_detected
+
+⸻
+
+📌 Summary
+	•	System is modular and resilient to partial startup
+	•	Recommended order enhances debuggability
+	•	Simulation-compatible from day one
